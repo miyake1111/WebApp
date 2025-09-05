@@ -1,0 +1,145 @@
+.dashboard-container {
+    padding: 20px;
+}
+
+    .dashboard-container h1 {
+        font-size: 32px;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+.rental-status-card {
+    background-color: #e0e0e0;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    font-size: 18px;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+    .status-badge.rental {
+        background-color: #e67e22;
+    }
+
+    .status-badge.available {
+        background-color: #27ae60;
+    }
+
+.rental-details {
+    margin: 20px 0;
+}
+
+    .rental-details p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+.return-button {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    padding: 15px 40px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .return-button:hover {
+        background-color: #229954;
+    }
+
+/* タブレット対応 */
+@media (max-width: 1024px) {
+    .dashboard-container h1 {
+        font-size: 28px;
+    }
+
+    .rental-status-card {
+        padding: 30px;
+    }
+
+    .return-button {
+        position: static;
+        margin-top: 20px;
+        width: 100%;
+    }
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 15px;
+    }
+
+        .dashboard-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+    .rental-status-card {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .status-header {
+        font-size: 16px;
+        gap: 15px;
+    }
+
+    .status-badge {
+        padding: 6px 20px;
+        font-size: 14px;
+    }
+
+    .rental-details p {
+        font-size: 14px;
+    }
+
+    .return-button {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}
+
+/* スマートフォン対応 */
+@media (max-width: 480px) {
+    .dashboard-container h1 {
+        font-size: 20px;
+    }
+
+    .rental-status-card {
+        padding: 15px;
+    }
+
+    .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .rental-details p {
+        font-size: 13px;
+        margin: 8px 0;
+    }
+}

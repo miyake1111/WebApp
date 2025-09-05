@@ -15,25 +15,53 @@ builder.Services.AddControllers()
     });
 
 // PostgreSQL接続サービスを追加
-// appsettings.jsonなどから接続文字列を取得する方がより良い方法です
 string connString = "Host=localhost;Username=postgres;Password=ms369369;Database=postgres";
 builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connString));
 
+// CORS設定を追加
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:61317", "https://localhost:61317")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Swaggerを完全に無効化（開発環境でも起動しない）
-// Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     // Swaggerを起動しない
-// }
+// CORS を有効化
+app.UseCors("AllowReactApp");
 
-app.UseHttpsRedirection();
+// HTTPSリダイレクトを一時的に無効化（開発時のみ）
+// app.UseHttpsRedirection();
+
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.MapFallbackToFile("/index.html");
+
+// データベース接続テスト
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var connection = scope.ServiceProvider.GetRequiredService<NpgsqlConnection>();
+        await connection.OpenAsync();
+        Console.WriteLine("データベース接続が正常に確立されました。");
+        await connection.CloseAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"データベース接続エラー: {ex.Message}");
+    }
+}
 
 app.Run();

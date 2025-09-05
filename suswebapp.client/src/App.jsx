@@ -1,47 +1,52 @@
 ﻿import React, { useState } from 'react';
-import Login from './Login/Login.jsx';
+import Login from './pages/Login/Login.jsx';
+import Layout from './components/Layout/Layout.jsx';
+import Dashboard from './pages/Dashboard/Dashboard.jsx';
+import RentalStatus from './pages/RentalStatus/RentalStatus.jsx';
 import './App.css';
 
-// シンプルなルーティング管理
-const App = () => {
+function App() {
     const [currentPage, setCurrentPage] = useState('login');
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // ログイン成功時の処理
-    const handleLoginSuccess = () => {
+    const handleLoginSuccess = (userInfo) => {
+        setCurrentUser(userInfo);
         setCurrentPage('dashboard');
     };
 
-    // ログアウト処理
     const handleLogout = () => {
+        setCurrentUser(null);
+        localStorage.removeItem('currentUser');
         setCurrentPage('login');
     };
 
-    // Dashboard コンポーネント
-    const Dashboard = () => {
-        return (
-            <div className="dashboard">
-                <h1>ログイン成功！PC貸出管理トップページ</h1>
-                <button
-                    onClick={handleLogout}
-                    className="logout-btn"
-                >
-                    ログアウト
-                </button>
-            </div>
-        );
+    const handleNavigate = (page) => {
+        setCurrentPage(page);
     };
 
-    // 現在のページに応じてコンポーネントを表示
+    if (currentPage === 'login') {
+        return <Login onLoginSuccess={handleLoginSuccess} />;
+    }
+
     return (
-        <div className="app">
-            {currentPage === 'login' && (
-                <Login onLoginSuccess={handleLoginSuccess} />
+        <Layout
+            user={currentUser}
+            onLogout={handleLogout}
+            onNavigate={handleNavigate}
+            currentPage={currentPage}
+        >
+            {currentPage === 'dashboard' && <Dashboard user={currentUser} />}
+            {currentPage === 'rentalStatus' && (
+                <RentalStatus
+                    user={currentUser}
+                    onBack={() => handleNavigate('dashboard')}
+                />
             )}
-            {currentPage === 'dashboard' && (
-                <Dashboard />
-            )}
-        </div>
+            {/* 今後追加 */}
+            {/* {currentPage === 'deviceList' && <DeviceList />} */}
+            {/* {currentPage === 'userList' && <UserList />} */}
+        </Layout>
     );
-};
+}
 
 export default App;

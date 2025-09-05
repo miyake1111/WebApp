@@ -1,0 +1,89 @@
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-container {
+    display: flex;
+    flex: 1;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #999999;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar-header {
+    margin-bottom: 40px;
+}
+
+.user-section {
+    color: white;
+    text-align: left;
+}
+
+.greeting {
+    font-size: 1.2rem;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.sidebar-user-name {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+    .nav-menu button {
+        padding: 25px;
+        background-color: white;
+        border: none;
+        border-radius: 10px;
+        color: #333;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .nav-menu button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* アクティブなページのボタンだけ紫色 */
+        .nav-menu button.active {
+            background-color: #7367F0;
+            color: white;
+        }
+
+    /* ログアウトボタンは常に赤 */
+    .nav-menu .logout-btn {
+        margin-top: auto;
+        background-color: #EA5455;
+        color: white;
+    }
+
+        .nav-menu .logout-btn:hover {
+            background-color: #d63031;
+            transform: translateY(-2px);
+        }
+
+.main-content {
+    flex: 1;
+    padding: 0;
+    background-color: white;
+    overflow-y: auto;
+}

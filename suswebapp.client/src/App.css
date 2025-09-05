@@ -11,18 +11,69 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 2rem;
+    color: white;
 }
 
     .dashboard h1 {
-        color: #333;
-        margin-bottom: 2rem;
+        color: white;
+        margin-bottom: 3rem;
         text-align: center;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
+/* ユーザー情報表示 */
+.user-info {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+    .user-info p {
+        margin: 0.5rem 0;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+/* メニューボタン */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.menu-btn {
+    padding: 1rem 2rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+    .menu-btn:hover {
+        background-color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .menu-btn:active {
+        transform: translateY(0);
+    }
+
+/* ログアウトボタン */
 .logout-btn {
     padding: 0.75rem 1.5rem;
     background-color: #dc3545;
@@ -31,12 +82,13 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     font-weight: 500;
 }
 
     .logout-btn:hover {
         background-color: #c82333;
+        transform: translateY(-1px);
     }
 
     .logout-btn:focus {
@@ -51,6 +103,24 @@
     }
 
         .dashboard h1 {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
         }
+
+    .menu-buttons {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .menu-btn {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
+    .menu-buttons {
+        flex-direction: row;
+        gap: 2rem;
+    }
 }
