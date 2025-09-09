@@ -1,100 +1,272 @@
 ﻿.rental-status-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .rental-status-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
     .rental-status-header h2 {
-        color: #333;
-        font-size: 24px;
         margin: 0;
+        color: #333;
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
     }
 
 .header-controls {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .toggle-btn, .back-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 5px;
+    font-size: clamp(0.85rem, 1.5vw, 0.95rem);
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .toggle-btn {
-    background-color: #2196F3;
+    background-color: #007bff;
     color: white;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-        font-size: 14px;
-    }
-
-    .rental-table td {
-        padding: 12px;
-        border-bottom: 1px solid #e0e0e0;
-        font-size: 14px;
-        color: #555;
-    }
-
-    .rental-table tbody tr:hover {
-        background-color: #f9f9f9;
-    }
-
-.asset-no.clickable {
-    color: #2196F3 !important;
-    cursor: pointer !important;
-    text-decoration: underline !important;
-    font-weight: 600;
-    display: inline-block;
-    transition: color 0.2s;
 }
 
-    .asset-no.clickable:hover {
-        color: #1976D2 !important;
-        background-color: rgba(33, 150, 243, 0.1);
+    .toggle-btn:hover {
+        background-color: #0056b3;
     }
 
-.employee-name {
-    font-weight: 500;
+.back-btn {
+    background-color: #6c757d;
+    color: white;
 }
 
-.overdue-row {
-    background-color: #fff3e0;
+    .back-btn:hover {
+        background-color: #5a6268;
+    }
+
+/* テーブルコンテナ */
+.rental-table-container {
+    flex: 1;
+    overflow: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
     flex-direction: column;
-    gap: 15px;
+    min-height: 0;
+}
+
+/* テーブルラッパー（横スクロール用） */
+.rental-table-wrapper {
+    overflow-x: auto;
     flex: 1;
 }
 
-    .nav-menu button {
-        padding: 25px;
-        background-color: white;
-        border: none;
-        border-radius: 10px;
-        color: #333;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* 基本のテーブル設定（モバイル用） */
+.rental-table {
+    width: 100%;
+    min-width: 550px;
+    border-collapse: collapse;
+    font-size: 0.75rem;
 }
 
-
-
-    .rental-table td.asset-no:hover {
-        color: #1976D2 !important;
-        background-color: rgba(33, 150, 243, 0.1);
+    .rental-table thead {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 10;
     }
+
+    .rental-table th {
+        padding: 6px 4px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        background-color: #f8f9fa;
+        white-space: nowrap;
+    }
+
+    .rental-table td {
+        padding: 6px 4px;
+        border-bottom: 1px solid #dee2e6;
+        color: #333;
+    }
+
+    .rental-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+.asset-no.clickable {
+    color: #007bff !important;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+    .asset-no.clickable:hover {
+        color: #0056b3 !important;
+    }
+
+/* ステータス表示 */
+.status-available {
+    display: inline-block;
+    padding: 2px 6px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.status-rental {
+    display: inline-block;
+    padding: 2px 6px;
+    background-color: #ffc107;
+    color: #333;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.table-footer {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.record-count {
+    color: #6c757d;
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #6c757d;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb;
+}
+
+/* 小さい画面から大きい画面の順で定義 */
+
+/* タブレット以上 */
+@media (min-width: 768px) {
+    .rental-table {
+        min-width: 700px;
+        font-size: 0.8rem;
+    }
+
+        .rental-table th,
+        .rental-table td {
+            padding: 8px 6px;
+        }
+
+    .status-available,
+    .status-rental {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* デスクトップ */
+@media (min-width: 992px) {
+    .rental-table {
+        min-width: 700px;
+        font-size: 0.85rem;
+    }
+
+        .rental-table th,
+        .rental-table td {
+            padding: 10px 8px;
+        }
+
+    .status-available,
+    .status-rental {
+        font-size: 0.8rem;
+    }
+}
+
+/* 大画面 */
+@media (min-width: 1200px) {
+    .rental-table {
+        min-width: 1000px;
+        font-size: 0.9rem;
+    }
+
+        .rental-table th,
+        .rental-table td {
+            padding: 12px 10px;
+        }
+
+    .status-available,
+    .status-rental {
+        font-size: 0.85rem;
+    }
+}
+
+/* より大きな画面 */
+@media (min-width: 1400px) {
+    .rental-table {
+        min-width: 1200px;
+    }
+
+        .rental-table th,
+        .rental-table td {
+            padding: 12px 20px;
+        }
+}
+
+/* 超大画面 */
+@media (min-width: 1600px) {
+    .rental-table {
+        min-width: calc(100% - 40px);
+    }
+}
+
+/* フルHD以上 */
+@media (min-width: 1600px) {
+    .rental-table {
+        width: 100%;
+    }
+
+        .rental-table th,
+        .rental-table td {
+            padding: 14px 40px;
+        }
+}
+
+/* 高さの調整 */
+@media (max-height: 700px) {
+    .rental-status-container {
+        padding: 10px;
+    }
+
+    .rental-status-header {
+        margin-bottom: 10px;
+    }
+}

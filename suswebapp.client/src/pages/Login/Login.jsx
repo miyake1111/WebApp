@@ -39,8 +39,12 @@ const Login = ({ onLoginSuccess }) => {
             });
 
             const data = await response.json();
+            console.log('Login API response:', data); // デバッグ用
 
             if (response.ok && data.success) {
+                console.log('User data from API:', data.user); // デバッグ用
+                console.log('EmployeeNo:', data.user.employeeNo); // デバッグ用
+
                 // ログイン成功
                 setIsLoading(false);
 

@@ -43,35 +43,33 @@ const Dashboard = ({ user }) => {
 
     return (
         <div className="dashboard-container">
-            <h1>{user?.name}氏名</h1>
+            <div className="dashboard-wrapper">  {/* ← この行を追加 */}
 
-            <div className="rental-status-card">
-                {loading ? (
-                    <p>読み込み中...</p>
-                ) : rentalInfo ? (
-                    <>
+                <div className="rental-status-card">
+                    {loading ? (
+                        <p>読み込み中...</p>
+                    ) : rentalInfo ? (
+                        <>
+                            <div className="status-header">
+                                <span>貸出状態：</span>
+                                <span className="status-badge rental">貸出中</span>
+                            </div>
+                            <div className="rental-details">
+                                <p>貸出機器：{rentalInfo.assetNo}</p>
+                                <p>貸出日：{rentalInfo.rentalDate}</p>
+                                <p>返却締切日：{rentalInfo.dueDate}</p>
+                            </div>
+                            <button className="return-button" onClick={handleReturn}>
+                                返却
+                            </button>
+                        </>
+                    ) : (
                         <div className="status-header">
                             <span>貸出状態：</span>
-                            <span className="status-badge rental">貸出中</span>
+                            <span className="status-badge available">なし</span>
                         </div>
-                        <div className="rental-details">
-                            <p>貸出機器：{rentalInfo.assetNo}</p>
-                            <p>貸出日：{rentalInfo.rentalDate}</p>
-                            <p>締切日：{rentalInfo.dueDate}</p>
-                            {rentalInfo.returnDate && (
-                                <p>返却締切日：{rentalInfo.returnDate}</p>
-                            )}
-                        </div>
-                        <button className="return-button" onClick={handleReturn}>
-                            返却
-                        </button>
-                    </>
-                ) : (
-                    <div className="status-header">
-                        <span>貸出状態：</span>
-                        <span className="status-badge available">なし</span>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

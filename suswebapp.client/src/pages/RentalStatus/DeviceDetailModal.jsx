@@ -1,11 +1,31 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import './DeviceDetailModal.css';
 
 const DeviceDetailModal = ({ device, onClose, onAction, currentUser }) => {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     if (!device) return null;
 
     const isRented = device.employeeNo && device.employeeNo !== '';
     const isCurrentUserRental = device.employeeNo === currentUser?.employeeNo;
+
+    const handleRental = async () => {
+        setIsProcessing(true);
+        try {
+            await onAction('rental', device);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleReturn = async () => {
+        setIsProcessing(true);
+        try {
+            await onAction('return', device);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -68,20 +88,26 @@ const DeviceDetailModal = ({ device, onClose, onAction, currentUser }) => {
                     {!isRented && (
                         <button
                             className="btn-rental"
-                            onClick={() => onAction('rental', device)}
+                            onClick={handleRental}
+                            disabled={isProcessing}
                         >
-                            貸出
+                            {isProcessing ? '処理中...' : '貸出'}
                         </button>
                     )}
                     {isRented && isCurrentUserRental && (
                         <button
                             className="btn-return"
-                            onClick={() => onAction('return', device)}
+                            onClick={handleReturn}
+                            disabled={isProcessing}
                         >
-                            返却
+                            {isProcessing ? '処理中...' : '返却'}
                         </button>
                     )}
-                    <button className="btn-cancel" onClick={onClose}>
+                    <button
+                        className="btn-cancel"
+                        onClick={onClose}
+                        disabled={isProcessing}
+                    >
                         キャンセル
                     </button>
                 </div>

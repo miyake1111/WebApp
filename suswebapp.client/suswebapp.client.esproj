@@ -16,7 +16,6 @@
     <Folder Include="src\components\ui\Table\" />
     <Folder Include="src\components\ui\Form\" />
     <Folder Include="src\components\ui\Alert\" />
-    <Folder Include="src\pages\DeviceList\" />
     <Folder Include="src\pages\UserList\" />
   </ItemGroup>
 </Project>
