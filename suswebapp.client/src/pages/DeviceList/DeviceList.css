@@ -1,14 +1,18 @@
 .device-list-container {
     padding: 30px;
-    min-height: 100vh;
+    height: 100vh;
     background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .device-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    flex-shrink: 0; /* ヘッダーは縮まないように */
 }
 
     .device-list-header h2 {
@@ -41,11 +45,15 @@
     cursor: pointer;
 }
 
+/* テーブルラッパーを修正 */
 .device-table-wrapper {
     background: white;
     border-radius: 10px;
     padding: 20px;
-    overflow-x: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1; /* 残りの高さを占める */
+    overflow: auto; /* スクロール可能にする */
+    min-height: 0; /* flexアイテムのスクロールに必要 */
 }
 
 .device-table {
@@ -53,17 +61,27 @@
     border-collapse: collapse;
 }
 
+    /* ヘッダーを固定する場合のスタイル */
+    .device-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
     .device-table th {
         background-color: #34495e;
         color: white;
         padding: 12px;
         text-align: left;
         font-weight: 500;
+        position: sticky;
+        top: 0;
     }
 
     .device-table td {
         padding: 12px;
         border-bottom: 1px solid #ecf0f1;
+        color: #2c3e50;
     }
 
     .device-table tr:hover {
@@ -89,10 +107,18 @@
     color: white;
 }
 
+    .edit-btn:hover {
+        background-color: #e67e22;
+    }
+
 .delete-btn {
     background-color: #e74c3c;
     color: white;
 }
+
+    .delete-btn:hover {
+        background-color: #c0392b;
+    }
 
 .loading {
     text-align: center;
@@ -100,3 +126,140 @@
     font-size: 18px;
     color: #7f8c8d;
 }
+
+.add-btn:hover {
+    background-color: #2980b9;
+}
+
+.back-btn:hover {
+    background-color: #7f8c8d;
+}
+
+/* レスポンシブ対応 */
+@media (max-height: 600px) {
+    .device-list-container {
+        padding: 15px;
+    }
+
+    .device-list-header {
+        margin-bottom: 10px;
+    }
+
+    .device-table-wrapper {
+        padding: 10px;
+    }
+}
+
+/* モードボタン */
+.mode-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.mode-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+    .mode-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+.add-mode-btn {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+    .add-mode-btn:hover {
+        background-color: #3498db;
+        color: white;
+    }
+
+.delete-mode-btn {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+    .delete-mode-btn.active {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+.edit-mode-btn {
+    border-color: #f39c12;
+    color: #f39c12;
+}
+
+    .edit-mode-btn.active {
+        background-color: #f39c12;
+        color: white;
+    }
+
+/* アイコンスタイル */
+.icon-plus {
+    font-weight: bold;
+}
+
+.icon-minus {
+    font-weight: bold;
+}
+
+.icon-pen {
+    font-size: 18px;
+}
+
+/* 資産番号セル */
+.asset-no-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* インライン編集・削除ボタン */
+.inline-edit-btn,
+.inline-delete-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.inline-edit-btn {
+    border-color: #f39c12;
+    color: #f39c12;
+}
+
+    .inline-edit-btn:hover {
+        background-color: #f39c12;
+        color: white;
+    }
+
+.inline-delete-btn {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+    .inline-delete-btn:hover {
+        background-color: #e74c3c;
+        color: white;
+    }

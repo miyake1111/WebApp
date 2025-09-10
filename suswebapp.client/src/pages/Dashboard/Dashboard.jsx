@@ -13,7 +13,6 @@ const Dashboard = ({ user }) => {
         try {
             const response = await fetch(`/api/rental/user/${user.employeeNo}`);
             const data = await response.json();
-
             if (response.ok && data.rental) {
                 setRentalInfo(data.rental);
             }
@@ -26,12 +25,10 @@ const Dashboard = ({ user }) => {
 
     const handleReturn = async () => {
         if (!rentalInfo) return;
-
         try {
             const response = await fetch(`/api/rental/return/${rentalInfo.rentalId}`, {
                 method: 'POST'
             });
-
             if (response.ok) {
                 alert('返却処理が完了しました');
                 setRentalInfo(null);
@@ -43,8 +40,7 @@ const Dashboard = ({ user }) => {
 
     return (
         <div className="dashboard-container">
-            <div className="dashboard-wrapper">  {/* ← この行を追加 */}
-
+            <div className="dashboard-wrapper">
                 <div className="rental-status-card">
                     {loading ? (
                         <p>読み込み中...</p>

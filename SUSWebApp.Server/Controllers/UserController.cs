@@ -1,57 +1,179 @@
-
-
-/*
-using Microsoft.AspNetCore.Mvc；
-using Npgsql;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SUSWebApp.Server.Data;
 using SUSWebApp.Server.Models.Entities;
+using SUSWebApp.Server.Models.Dto;
 
-namespace SUSWebApp.Server.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class UserController : ControllerBase
+namespace SUSWebApp.Server.Controllers
 {
-    private readonly NpgsqlConnection _connection;
-
-    public UserController(NpgsqlConnection connection)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UserController : ControllerBase
     {
-        _connection = connection;
-    }
+        private readonly ApplicationDbContext _context;
 
-    [HttpGet]
-    public async Task<IEnumerable<User>> Get()
-    {
-        var users = new List<User>();
-        await _connection.OpenAsync();
-
-        string sql = "SELECT employee_no, name, name_kana, department, tel_no, mail_adress, age, gender, position, account_level, retire_date, register_date, update_date, delete_flag FROM MST_USER;";
-
-        await using (var cmd = new NpgsqlCommand(sql, _connection))
-        await using (var reader = await cmd.ExecuteReaderAsync())
+        public UserController(ApplicationDbContext context)
         {
-            while (await reader.ReadAsync())
+            _context = context;
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetUserList()
+        {
+            try
             {
-                users.Add(new User
+                var users = await _context.MstUsers
+                    .Where(u => !u.IsDeleted)
+                    .OrderBy(u => u.EmployeeNo)
+                    .Select(u => new
+                    {
+                        employeeNo = u.EmployeeNo,
+                        name = u.Name,
+                        nameKana = u.NameKana,
+                        department = u.Department,
+                        phone = u.Phone,
+                        email = u.Email,
+                        age = u.Age,
+                        gender = u.Gender,  // ← Gender == 1の比較を削除
+                        position = u.Position ?? "",
+                        pcAuthority = u.PcAuthority,
+                        updateDate = u.UpdateDate
+                    })
+                    .ToListAsync();
+
+                return Ok(new
                 {
-                    employee_no = reader.GetString(reader.GetOrdinal("employee_no")),
-                    name = reader.GetString(reader.GetOrdinal("name")),
-                    name_kana = reader.IsDBNull(reader.GetOrdinal("name_kana")) ? null : reader.GetString(reader.GetOrdinal("name_kana")),
-                    department = reader.IsDBNull(reader.GetOrdinal("department")) ? null : reader.GetString(reader.GetOrdinal("department")),
-                    tel_no = reader.IsDBNull(reader.GetOrdinal("tel_no")) ? null : reader.GetString(reader.GetOrdinal("tel_no")),
-                    mail_adress = reader.IsDBNull(reader.GetOrdinal("mail_adress")) ? null : reader.GetString(reader.GetOrdinal("mail_adress")),
-                    age = reader.IsDBNull(reader.GetOrdinal("age")) ? 0 : reader.GetInt32(reader.GetOrdinal("age")),
-                    gender = reader.IsDBNull(reader.GetOrdinal("gender")) ? 0 : reader.GetInt32(reader.GetOrdinal("gender")),
-                    position = reader.IsDBNull(reader.GetOrdinal("position")) ? null : reader.GetString(reader.GetOrdinal("position")),
-                    account_level = reader.IsDBNull(reader.GetOrdinal("account_level")) ? null : reader.GetString(reader.GetOrdinal("account_level")),
-                    retire_date = reader.IsDBNull(reader.GetOrdinal("retire_date")) ? null : reader.GetDateTime(reader.GetOrdinal("retire_date")),
-                    register_date = reader.GetDateTime(reader.GetOrdinal("register_date")),
-                    update_date = reader.IsDBNull(reader.GetOrdinal("update_date")) ? null : reader.GetDateTime(reader.GetOrdinal("update_date")),
-                    delete_flag = reader.GetBoolean(reader.GetOrdinal("delete_flag"))
+                    success = true,
+                    data = users
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = "ユーザー取得エラー",
+                    error = ex.Message
                 });
             }
         }
-        _connection.Close();
-        return users;
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
+        {
+            try
+            {
+                var existing = await _context.MstUsers
+                    .FirstOrDefaultAsync(u => u.EmployeeNo == dto.EmployeeNo);
+
+                if (existing != null)
+                {
+                    return BadRequest(new { message = "この社員番号は既に存在します" });
+                }
+
+                var user = new MstUser
+                {
+                    EmployeeNo = dto.EmployeeNo,
+                    Name = dto.Name ?? "",
+                    NameKana = dto.NameKana ?? "",
+                    Department = dto.Department ?? "",
+                    Phone = dto.Phone ?? "",
+                    Email = dto.Email ?? "",
+                    Age = dto.Age,
+                    Gender = dto.Gender ?? "",  // 文字列のまま
+                    Position = dto.Position ?? "",
+                    PcAuthority = dto.PcAuthority ?? "利用者",
+                    RegistrationDate = dto.RegistrationDate?.ToUniversalTime() ?? DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow,
+                    RetirementDate = dto.RetirementDate?.ToUniversalTime(),
+                    IsDeleted = false
+                };
+
+                _context.MstUsers.Add(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "登録成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "登録エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("update/{employeeNo}")]
+        public async Task<IActionResult> UpdateUser(string employeeNo, [FromBody] UserUpdateDto dto)
+        {
+            try
+            {
+                var user = await _context.MstUsers
+                    .FirstOrDefaultAsync(u => u.EmployeeNo == employeeNo && !u.IsDeleted);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "ユーザーが見つかりません" });
+                }
+
+                user.Name = dto.Name ?? user.Name;
+                user.NameKana = dto.NameKana ?? user.NameKana;
+                user.Department = dto.Department ?? user.Department;
+                user.Phone = dto.Phone ?? user.Phone;
+                user.Email = dto.Email ?? user.Email;
+                user.Age = dto.Age;
+                user.Gender = dto.Gender ?? user.Gender;  // 文字列のまま
+                user.Position = dto.Position ?? user.Position;
+                user.PcAuthority = dto.PcAuthority ?? user.PcAuthority;
+                user.RetirementDate = dto.RetirementDate?.ToUniversalTime();
+                user.UpdateDate = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "更新成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "更新エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("delete/{employeeNo}")]
+        public async Task<IActionResult> DeleteUser(string employeeNo)
+        {
+            try
+            {
+                var user = await _context.MstUsers
+                    .FirstOrDefaultAsync(u => u.EmployeeNo == employeeNo);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "ユーザーが見つかりません" });
+                }
+
+                user.IsDeleted = true;
+                user.RetirementDate = DateTime.UtcNow;
+                user.UpdateDate = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "削除成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "削除エラー",
+                    error = ex.Message
+                });
+            }
+        }
     }
 }
-*/

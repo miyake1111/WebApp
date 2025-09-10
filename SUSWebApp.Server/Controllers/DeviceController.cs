@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SUSWebApp.Server.Data;
+using SUSWebApp.Server.Models.Dto;
 using SUSWebApp.Server.Models.Entities;
 
 namespace SUSWebApp.Server.Controllers
@@ -136,6 +137,180 @@ namespace SUSWebApp.Server.Controllers
                 return StatusCode(500, new
                 {
                     message = "利用可能デバイス取得エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetDeviceList()
+        {
+            try
+            {
+                var devices = await _context.MstDevices
+                    .Where(d => !d.IsDeleted)
+                    .ToListAsync();
+                // メモリ上で資産番号を解析してソート
+                var sortedDevices = devices
+                    .OrderBy(d => {
+                        // 資産番号を分解して並び替え
+                        var parts = d.AssetNo.Split('-');
+                        if (parts.Length >= 3)
+                        {
+                            // A19-06-001 のような形式を想定
+                            return $"{parts[0]}-{parts[1].PadLeft(2, '0')}-{parts[2].PadLeft(3, '0')}";
+                        }
+                        return d.AssetNo;
+                    })
+                    .Select(d => new
+                    {
+                        assetNo = d.AssetNo,
+                        manufacturer = d.Manufacturer,
+                        os = d.Os,
+                        memory = d.Memory,
+                        storage = d.Storage,
+                        graphicsCard = d.GraphicsCard,
+                        storageLocation = d.StorageLocation,
+                        isBroken = d.IsBroken,
+                        remarks = d.Remarks ?? ""  // NULLの場合は空文字列
+                    })
+                    .ToList();
+
+                return Ok(new
+                {
+                    success = true,
+                    data = devices
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = "デバイス取得エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        // デバイス削除（論理削除）
+        // デバイス削除メソッドも修正
+        [HttpDelete("delete/{assetNo}")]
+        public async Task<IActionResult> DeleteDevice(string assetNo)
+        {
+            try
+            {
+                var device = await _context.MstDevices
+                    .FirstOrDefaultAsync(d => d.AssetNo == assetNo);
+
+                if (device == null)
+                {
+                    return NotFound(new { message = "デバイスが見つかりません" });
+                }
+
+                // 論理削除
+                device.IsDeleted = true;
+                device.UpdateDate = DateTime.UtcNow;  // UtcNowを使用
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "削除成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "削除エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        // デバイス新規登録
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateDevice([FromBody] DeviceCreateDto dto)
+        {
+            try
+            {
+                var existing = await _context.MstDevices
+                    .FirstOrDefaultAsync(d => d.AssetNo == dto.AssetNo);
+
+                if (existing != null)
+                {
+                    return BadRequest(new { message = "この資産番号は既に存在します" });
+                }
+
+                var device = new MstDevice
+                {
+                    AssetNo = dto.AssetNo,
+                    Manufacturer = dto.Manufacturer ?? "",
+                    Os = dto.Os ?? "",
+                    Memory = dto.Memory,
+                    Storage = dto.Storage,
+                    GraphicsCard = dto.GraphicsCard ?? "",
+                    StorageLocation = dto.StorageLocation ?? "",
+                    IsBroken = dto.IsBroken,
+                    LeaseStartDate = dto.LeaseStartDate?.ToUniversalTime(),  // UTCに変換
+                    LeaseEndDate = dto.LeaseEndDate?.ToUniversalTime(),      // UTCに変換
+                    Remarks = dto.Remarks,
+                    RegistrationDate = DateTime.UtcNow,  // UtcNowを使用
+                    UpdateDate = DateTime.UtcNow,        // UtcNowを使用
+                    IsDeleted = false
+                };
+
+                _context.MstDevices.Add(device);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "登録成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "登録エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        // デバイス更新
+        [HttpPut("update/{assetNo}")]
+        public async Task<IActionResult> UpdateDevice(string assetNo, [FromBody] DeviceUpdateDto dto)
+        {
+            try
+            {
+                var device = await _context.MstDevices
+                    .FirstOrDefaultAsync(d => d.AssetNo == assetNo && !d.IsDeleted);
+
+                if (device == null)
+                {
+                    return NotFound(new { message = "デバイスが見つかりません" });
+                }
+
+                // 更新
+                device.Manufacturer = dto.Manufacturer ?? device.Manufacturer;
+                device.Os = dto.Os ?? device.Os;
+                device.Memory = dto.Memory;
+                device.Storage = dto.Storage;
+                device.GraphicsCard = dto.GraphicsCard ?? device.GraphicsCard;
+                device.StorageLocation = dto.StorageLocation ?? device.StorageLocation;
+                device.IsBroken = dto.IsBroken;
+                device.LeaseStartDate = dto.LeaseStartDate?.ToUniversalTime(); // UTCに変換
+                device.LeaseEndDate = dto.LeaseEndDate?.ToUniversalTime();     // UTCに変換
+                device.Remarks = dto.Remarks;
+                device.UpdateDate = DateTime.UtcNow;  // UtcNowを使用
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "更新成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "更新エラー",
                     error = ex.Message
                 });
             }

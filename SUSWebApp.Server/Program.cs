@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using SUSWebApp.Server.Data;
 using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -14,8 +16,14 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
-// PostgreSQL接続サービスを追加
+// PostgreSQL接続文字列
 string connString = "Host=localhost;Username=postgres;Password=ms369369;Database=postgres";
+
+// ★ ApplicationDbContextをDIコンテナに登録（重要！）★
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connString));
+
+// NpgsqlConnectionも引き続き使用可能にする
 builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connString));
 
 // CORS設定を追加
@@ -30,9 +38,19 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Swagger追加（オプション - APIテスト用）
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -53,9 +71,15 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
+        // ApplicationDbContextでの接続テスト
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await dbContext.Database.CanConnectAsync();
+        Console.WriteLine("ApplicationDbContext: データベース接続が正常に確立されました。");
+
+        // NpgsqlConnectionでの接続テスト（既存のコード）
         var connection = scope.ServiceProvider.GetRequiredService<NpgsqlConnection>();
         await connection.OpenAsync();
-        Console.WriteLine("データベース接続が正常に確立されました。");
+        Console.WriteLine("NpgsqlConnection: データベース接続が正常に確立されました。");
         await connection.CloseAsync();
     }
     catch (Exception ex)

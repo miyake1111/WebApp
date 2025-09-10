@@ -44,7 +44,7 @@ namespace SUSWebApp.Server.Models.Entities
 
         [Column("remarks")]
         [MaxLength(255)]
-        public string Remarks { get; set; } = string.Empty;
+        public string? Remarks { get; set; }  // ← null許可に変更（?を追加）
 
         [Column("registration_date")]
         public DateTime RegistrationDate { get; set; }

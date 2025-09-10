@@ -23,12 +23,12 @@ namespace SUSWebApp.Server.Models.Entities
         [MaxLength(100)]
         public string Department { get; set; } = string.Empty;
 
-        [Column("phone_number")]
+        [Column("phone_number")]  // ← "phone" から "phone_number" に変更
         [MaxLength(20)]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
 
         [Column("email")]
-        [MaxLength(200)]
+        [MaxLength(255)]
         public string Email { get; set; } = string.Empty;
 
         [Column("age")]
@@ -36,15 +36,15 @@ namespace SUSWebApp.Server.Models.Entities
 
         [Column("gender")]
         [MaxLength(10)]
-        public string Gender { get; set; } = string.Empty;
+        public string Gender { get; set; } = string.Empty;  // int から string に変更
 
         [Column("position")]
         [MaxLength(50)]
-        public string Position { get; set; } = string.Empty;
+        public string? Position { get; set; }
 
-        [Column("pc_account_auth")]
-        [MaxLength(50)]
-        public string PcAccountAuth { get; set; } = string.Empty;
+        [Column("pc_account_auth")]  // ← "pc_authority" から "pc_account_auth" に変更
+        [MaxLength(20)]
+        public string PcAuthority { get; set; } = "利用者";
 
         [Column("registration_date")]
         public DateTime RegistrationDate { get; set; }
