@@ -227,13 +227,61 @@
 
 /* テーブル関連 */
 .user-table-wrapper {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex: 1;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* テーブルコンテナ全体 - 追加 */
+.user-table-container {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
     min-height: 0;
+    overflow: hidden;
+}
+
+/* 詳細ビュー時 */
+.user-table-wrapper.detail-view {
+    overflow-x: auto;
+}
+
+/* テーブルフッターを修正 */
+.table-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.record-count {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* 詳細ボタンコンテナ（テーブル外） */
+.detail-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
 }
 
 .user-table {
@@ -408,3 +456,20 @@
         padding: 10px;
     }
 }
+
+/* 退職者の行のスタイル */
+.user-table tbody tr.retired-row {
+    background-color: #a9a9a9; /* 薄い灰色 */
+    color: #666; /* テキストも少し薄く */
+    opacity: 0.8; /* 全体的に少し透明度を下げる */
+}
+
+    .user-table tbody tr.retired-row:hover {
+        background-color: #eeeeee; /* ホバー時も灰色系を維持 */
+    }
+
+    /* 退職者の行でも編集・削除ボタンは見やすく */
+    .user-table tbody tr.retired-row .inline-edit-btn,
+    .user-table tbody tr.retired-row .inline-delete-btn {
+        opacity: 1;
+    }

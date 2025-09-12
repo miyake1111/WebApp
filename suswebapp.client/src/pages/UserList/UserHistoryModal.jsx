@@ -3,8 +3,9 @@ import './UserHistoryModal.css';
 
 const UserHistoryModal = ({ isOpen, onClose }) => {
     const [historyData, setHistoryData] = useState([]);
-    const [filterMode, setFilterMode] = useState('all'); // all, self, others
+    const [filterMode, setFilterMode] = useState('all');
     const [loading, setLoading] = useState(false);
+    const currentUserEmployeeNo = localStorage.getItem('employeeNo') || 'A1002';
 
     useEffect(() => {
         if (isOpen) {
@@ -29,13 +30,20 @@ const UserHistoryModal = ({ isOpen, onClose }) => {
 
     const getFilteredHistory = () => {
         if (filterMode === 'self') {
-            // 自分の更新のみ（実装時は現在のユーザーIDと比較）
-            return historyData.filter(h => h.updatedBy === 'current_user');
+            return historyData.filter(h => h.updaterEmployeeNo === currentUserEmployeeNo);
         } else if (filterMode === 'others') {
-            // 他人の更新のみ
-            return historyData.filter(h => h.updatedBy !== 'current_user');
+            return historyData.filter(h => h.updaterEmployeeNo !== currentUserEmployeeNo);
         }
         return historyData;
+    };
+
+    const parseChangeContent = (content) => {
+        if (!content) return { before: '-', after: '-' };
+        const parts = content.split(' → ');
+        return {
+            before: parts[0] || '-',
+            after: parts[1] || '-'
+        };
     };
 
     if (!isOpen) return null;
@@ -76,7 +84,7 @@ const UserHistoryModal = ({ isOpen, onClose }) => {
                                 <tr>
                                     <th>更新日時</th>
                                     <th>更新者</th>
-                                    <th>対象社員番号</th>
+                                    <th>対象社員</th>
                                     <th>変更項目</th>
                                     <th>変更前</th>
                                     <th>変更後</th>
@@ -84,16 +92,27 @@ const UserHistoryModal = ({ isOpen, onClose }) => {
                             </thead>
                             <tbody>
                                 {getFilteredHistory().length > 0 ? (
-                                    getFilteredHistory().map((history, index) => (
-                                        <tr key={index}>
-                                            <td>{new Date(history.updateDate).toLocaleString('ja-JP')}</td>
-                                            <td>{history.updatedBy}</td>
-                                            <td>{history.targetEmployeeNo}</td>
-                                            <td>{history.changedField}</td>
-                                            <td>{history.oldValue || '-'}</td>
-                                            <td>{history.newValue || '-'}</td>
-                                        </tr>
-                                    ))
+                                    getFilteredHistory().map((history) => {
+                                        const { before, after } = parseChangeContent(history.changeContent);
+                                        return (
+                                            <tr key={history.id}>
+                                                <td>{history.changeDate}</td>
+                                                <td className="employee-info-cell">
+                                                    <div>{history.updaterEmployeeNo}</div>
+                                                    <div>{history.updaterName}</div>
+                                                    <div className="kana">{history.updaterNameKana}</div>
+                                                </td>
+                                                <td className="employee-info-cell">
+                                                    <div>{history.targetEmployeeNo}</div>
+                                                    <div>{history.targetName}</div>
+                                                    <div className="kana">{history.targetNameKana}</div>
+                                                </td>
+                                                <td>{history.changeField}</td>
+                                                <td>{before}</td>
+                                                <td>{after}</td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr>
                                         <td colSpan="6" className="no-data">

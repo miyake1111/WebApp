@@ -48,8 +48,9 @@ const Login = ({ onLoginSuccess }) => {
                 // ログイン成功
                 setIsLoading(false);
 
-                // ユーザー情報をローカルストレージに保存（オプション）
+                // ユーザー情報をローカルストレージに保存
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
+                localStorage.setItem('employeeNo', data.user.employeeNo);  // 社員番号を別途保存
 
                 if (onLoginSuccess) {
                     onLoginSuccess(data.user);

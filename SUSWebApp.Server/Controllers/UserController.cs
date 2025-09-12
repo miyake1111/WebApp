@@ -34,10 +34,12 @@ namespace SUSWebApp.Server.Controllers
                         phone = u.Phone,
                         email = u.Email,
                         age = u.Age,
-                        gender = u.Gender,  // ← Gender == 1の比較を削除
+                        gender = u.Gender,
                         position = u.Position ?? "",
                         pcAuthority = u.PcAuthority,
-                        updateDate = u.UpdateDate
+                        registrationDate = u.RegistrationDate,  // 追加
+                        updateDate = u.UpdateDate,
+                        retirementDate = u.RetirementDate  // 追加
                     })
                     .ToListAsync();
 
@@ -80,7 +82,7 @@ namespace SUSWebApp.Server.Controllers
                     Phone = dto.Phone ?? "",
                     Email = dto.Email ?? "",
                     Age = dto.Age,
-                    Gender = dto.Gender ?? "",  // 文字列のまま
+                    Gender = dto.Gender ?? "",
                     Position = dto.Position ?? "",
                     PcAuthority = dto.PcAuthority ?? "利用者",
                     RegistrationDate = dto.RegistrationDate?.ToUniversalTime() ?? DateTime.UtcNow,
@@ -118,17 +120,119 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "ユーザーが見つかりません" });
                 }
 
-                user.Name = dto.Name ?? user.Name;
-                user.NameKana = dto.NameKana ?? user.NameKana;
-                user.Department = dto.Department ?? user.Department;
-                user.Phone = dto.Phone ?? user.Phone;
-                user.Email = dto.Email ?? user.Email;
+                // リクエストヘッダーからログインユーザーの社員番号を取得
+                var currentUserEmployeeNo = Request.Headers["X-User-EmployeeNo"].ToString();
+                if (string.IsNullOrEmpty(currentUserEmployeeNo))
+                {
+                    currentUserEmployeeNo = "SYSTEM";
+                }
+
+                // 変更履歴を記録するためのリスト
+                var changes = new List<HstUserChange>();
+
+                // 各フィールドの変更をチェックして履歴に追加
+                if (dto.Name != null && dto.Name != user.Name)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "氏名",
+                        ChangeContent = $"{user.Name} → {dto.Name}"
+                    });
+                    user.Name = dto.Name;
+                }
+
+                if (dto.NameKana != null && dto.NameKana != user.NameKana)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "氏名（カナ）",
+                        ChangeContent = $"{user.NameKana} → {dto.NameKana}"
+                    });
+                    user.NameKana = dto.NameKana;
+                }
+
+                if (dto.Department != null && dto.Department != user.Department)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "部署",
+                        ChangeContent = $"{user.Department} → {dto.Department}"
+                    });
+                    user.Department = dto.Department;
+                }
+
+                if (dto.Phone != null && dto.Phone != user.Phone)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "電話番号",
+                        ChangeContent = $"{user.Phone} → {dto.Phone}"
+                    });
+                    user.Phone = dto.Phone;
+                }
+
+                if (dto.Email != null && dto.Email != user.Email)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "メールアドレス",
+                        ChangeContent = $"{user.Email} → {dto.Email}"
+                    });
+                    user.Email = dto.Email;
+                }
+
+                if (dto.Position != null && dto.Position != user.Position)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "役職",
+                        ChangeContent = $"{user.Position ?? "なし"} → {dto.Position}"
+                    });
+                    user.Position = dto.Position;
+                }
+
+                if (dto.PcAuthority != null && dto.PcAuthority != user.PcAuthority)
+                {
+                    changes.Add(new HstUserChange
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        ChangedByEmployeeNo = currentUserEmployeeNo,
+                        TargetEmployeeNo = employeeNo,
+                        ChangeField = "PCアカウント権限",
+                        ChangeContent = $"{user.PcAuthority} → {dto.PcAuthority}"
+                    });
+                    user.PcAuthority = dto.PcAuthority;
+                }
+
+                // その他のフィールドも更新
                 user.Age = dto.Age;
-                user.Gender = dto.Gender ?? user.Gender;  // 文字列のまま
-                user.Position = dto.Position ?? user.Position;
-                user.PcAuthority = dto.PcAuthority ?? user.PcAuthority;
+                user.Gender = dto.Gender ?? user.Gender;
                 user.RetirementDate = dto.RetirementDate?.ToUniversalTime();
                 user.UpdateDate = DateTime.UtcNow;
+
+                // 変更履歴をデータベースに追加
+                if (changes.Any())
+                {
+                    _context.HstUserChanges.AddRange(changes);
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -158,6 +262,25 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "ユーザーが見つかりません" });
                 }
 
+                // リクエストヘッダーからログインユーザーの社員番号を取得
+                var currentUserEmployeeNo = Request.Headers["X-User-EmployeeNo"].ToString();
+                if (string.IsNullOrEmpty(currentUserEmployeeNo))
+                {
+                    currentUserEmployeeNo = "SYSTEM";  // ヘッダーがない場合のデフォルト
+                }
+
+                // 削除履歴を記録
+                var deleteHistory = new HstUserChange
+                {
+                    ChangeDate = DateTime.UtcNow,
+                    ChangedByEmployeeNo = currentUserEmployeeNo,
+                    TargetEmployeeNo = employeeNo,
+                    ChangeField = "削除",
+                    ChangeContent = $"ユーザー削除: {user.Name}"
+                };
+
+                _context.HstUserChanges.Add(deleteHistory);
+
                 user.IsDeleted = true;
                 user.RetirementDate = DateTime.UtcNow;
                 user.UpdateDate = DateTime.UtcNow;
@@ -171,6 +294,62 @@ namespace SUSWebApp.Server.Controllers
                 return StatusCode(500, new
                 {
                     message = "削除エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetUserHistory()
+        {
+            try
+            {
+                var history = await _context.HstUserChanges
+                    .OrderByDescending(h => h.ChangeDate)
+                    .ToListAsync();
+
+                var result = new List<object>();
+                foreach (var h in history)
+                {
+                    // 更新者の情報を取得
+                    var updater = await _context.MstUsers
+                        .Where(u => u.EmployeeNo == h.ChangedByEmployeeNo)
+                        .Select(u => new { u.EmployeeNo, u.Name, u.NameKana })
+                        .FirstOrDefaultAsync();
+
+                    // 対象者の情報を取得
+                    var target = await _context.MstUsers
+                        .Where(u => u.EmployeeNo == h.TargetEmployeeNo)
+                        .Select(u => new { u.EmployeeNo, u.Name, u.NameKana })
+                        .FirstOrDefaultAsync();
+
+                    result.Add(new
+                    {
+                        id = h.ChangeId,
+                        changeDate = h.ChangeDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm"),
+                        updaterEmployeeNo = updater?.EmployeeNo ?? h.ChangedByEmployeeNo,
+                        updaterName = updater?.Name ?? "不明",
+                        updaterNameKana = updater?.NameKana ?? "",
+                        targetEmployeeNo = target?.EmployeeNo ?? h.TargetEmployeeNo,
+                        targetName = target?.Name ?? "不明",
+                        targetNameKana = target?.NameKana ?? "",
+                        changeField = h.ChangeField,
+                        changeContent = h.ChangeContent
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = "履歴取得エラー",
                     error = ex.Message
                 });
             }
