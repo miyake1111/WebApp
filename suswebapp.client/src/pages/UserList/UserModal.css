@@ -113,3 +113,14 @@
     .cancel-btn:hover {
         background-color: #c0392b;
     }
+
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-group input:invalid {
+    border-color: #dc3545;
+}

@@ -473,3 +473,99 @@
     .user-table tbody tr.retired-row .inline-delete-btn {
         opacity: 1;
     }
+
+
+
+
+
+
+
+/* テーブルコンテナの
+レスポンシブ対応 */
+.user-table-container {
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+}
+
+.user-table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* 横スクロールを自動で表示 */
+    overflow-y: visible;
+    border-radius: 8px;
+}
+
+    /* スクロールバーのスタイリング（オプション） */
+    .user-table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .user-table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .user-table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+        .user-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+/* テーブル本体のスタイル */
+.user-table {
+    width: 100%;
+    min-width: 1400px; /* テーブルの最小幅を設定 */
+    border-collapse: collapse;
+}
+
+/* 詳細表示モードの場合はさらに幅を広げる */
+.user-table-wrapper.detail-view .user-table {
+    min-width: 1400px; /* 詳細表示時の最小幅 */
+}
+
+/* テーブルヘッダーを固定（オプション） */
+.user-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #34495e;
+    z-index: 10;
+}
+
+/* 画面幅に応じた調整 */
+@media (max-width: 1200px) {
+    .user-table-wrapper {
+        /* 画面が小さい時は横スクロールが必要 */
+        max-width: calc(100vw - 40px);
+    }
+}
+
+@media (min-width: 1201px) {
+    /* 画面が十分大きい時 */
+    .user-table-wrapper {
+        overflow-x: auto; /* 必要に応じてスクロール表示 */
+    }
+
+        /* 通常表示でテーブルが収まる場合はスクロールなし */
+        .user-table-wrapper:not(.detail-view) {
+            overflow-x: auto;
+        }
+}
+
+/* テーブルフッターは常に表示 */
+.table-footer {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+}
