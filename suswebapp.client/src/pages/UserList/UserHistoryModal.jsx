@@ -75,56 +75,67 @@ const UserHistoryModal = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                <div className="history-table-wrapper">
-                    {loading ? (
-                        <div className="loading">読み込み中...</div>
-                    ) : (
-                        <table className="history-table">
-                            <thead>
-                                <tr>
-                                    <th>更新日時</th>
-                                    <th>更新者</th>
-                                    <th>対象社員</th>
-                                    <th>変更項目</th>
-                                    <th>変更前</th>
-                                    <th>変更後</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {getFilteredHistory().length > 0 ? (
-                                    getFilteredHistory().map((history) => {
-                                        const { before, after } = parseChangeContent(history.changeContent);
-                                        return (
-                                            <tr key={history.id}>
-                                                <td>{history.changeDate}</td>
-                                                <td className="employee-info-cell">
-                                                    <div>{history.updaterEmployeeNo}</div>
-                                                    <div>{history.updaterName}</div>
-                                                    <div className="kana">{history.updaterNameKana}</div>
-                                                </td>
-                                                <td className="employee-info-cell">
-                                                    <div>{history.targetEmployeeNo}</div>
-                                                    <div>{history.targetName}</div>
-                                                    <div className="kana">{history.targetNameKana}</div>
-                                                </td>
-                                                <td>{history.changeField}</td>
-                                                <td>{before}</td>
-                                                <td>{after}</td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
+                {/* history-table-containerで全体をラップ */}
+                <div className="history-table-container">
+                    <div className="history-table-wrapper">
+                        {loading ? (
+                            <div className="loading">読み込み中...</div>
+                        ) : (
+                            <table className="history-table">
+                                <thead>
                                     <tr>
-                                        <td colSpan="6" className="no-data">
-                                            履歴データがありません
-                                        </td>
+                                        <th>更新日時</th>
+                                        <th>更新者</th>
+                                        <th>対象社員</th>
+                                        <th>変更項目</th>
+                                        <th>変更前</th>
+                                        <th>変更後</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    )}
+                                </thead>
+                                <tbody>
+                                    {getFilteredHistory().length > 0 ? (
+                                        getFilteredHistory().map((history) => {
+                                            const { before, after } = parseChangeContent(history.changeContent);
+                                            return (
+                                                <tr key={history.id}>
+                                                    <td>{history.changeDate}</td>
+                                                    <td className="employee-info-cell">
+                                                        <div>{history.updaterEmployeeNo}</div>
+                                                        <div>{history.updaterName}</div>
+                                                        <div className="kana">{history.updaterNameKana}</div>
+                                                    </td>
+                                                    <td className="employee-info-cell">
+                                                        <div>{history.targetEmployeeNo}</div>
+                                                        <div>{history.targetName}</div>
+                                                        <div className="kana">{history.targetNameKana}</div>
+                                                    </td>
+                                                    <td>{history.changeField}</td>
+                                                    <td>{before}</td>
+                                                    <td>{after}</td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6" className="no-data">
+                                                履歴データがありません
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    {/* history-footerをcontainerの中に配置 */}
+                    <div className="history-footer">
+                        <span className="record-count">
+                            表示中：{getFilteredHistory().length}件
+                        </span>
+                    </div>
                 </div>
 
+                {/* modal-footerはcontainerの外 */}
                 <div className="modal-footer">
                     <button className="cancel-btn" onClick={onClose}>
                         キャンセル

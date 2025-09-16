@@ -124,3 +124,21 @@
 .form-group input:invalid {
     border-color: #dc3545;
 }
+
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.checking-text {
+    color: #007bff;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-group input.error {
+    border-color: #dc3545;
+}

@@ -18,6 +18,7 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
     });
 
     const [errors, setErrors] = useState({});
+    const [isChecking, setIsChecking] = useState(false);
 
     useEffect(() => {
         if (user && mode === 'edit') {
@@ -28,35 +29,99 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                 retirementDate: user.retirementDate ?
                     new Date(user.retirementDate).toISOString().split('T')[0] : ''
             });
+        } else if (mode === 'add' && isOpen) {
+            // 新規登録時は毎回フォームをリセット
+            setFormData({
+                employeeNo: '',
+                name: '',
+                nameKana: '',
+                department: '開発1課',
+                phone: '',
+                email: '',
+                age: 20,
+                gender: '男',
+                position: '一般',
+                pcAuthority: '利用者',
+                registrationDate: new Date().toISOString().split('T')[0],
+                retirementDate: null
+            });
+            setErrors({});
         }
-    }, [user, mode]);
+    }, [user, mode, isOpen]);
+
+    // 社員番号の重複チェック
+    const checkEmployeeNoDuplicate = async (employeeNo) => {
+        if (mode === 'add' && employeeNo && /^[A-Z][0-9]{4}$/.test(employeeNo)) {
+            setIsChecking(true);
+            try {
+                const response = await fetch('/api/user/list');
+                const data = await response.json();
+                if (data.success) {
+                    const exists = data.data.some(u => u.employeeNo === employeeNo);
+                    if (exists) {
+                        setErrors(prev => ({ ...prev, employeeNo: 'この社員番号は既に使用されています' }));
+                    } else {
+                        const newErrors = { ...errors };
+                        delete newErrors.employeeNo;
+                        setErrors(newErrors);
+                    }
+                }
+            } catch (error) {
+                console.error('重複チェックエラー:', error);
+            } finally {
+                setIsChecking(false);
+            }
+        }
+    };
 
     // 社員番号の入力制限（大文字アルファベット1文字＋数字4桁）
     const handleEmployeeNoChange = (e) => {
         const value = e.target.value.toUpperCase();
-        // 大文字アルファベットと数字のみ許可
         if (/^[A-Z]?[0-9]{0,4}$/.test(value) || value === '') {
             setFormData({ ...formData, employeeNo: value });
 
-            // バリデーション
             if (value && !/^[A-Z][0-9]{4}$/.test(value)) {
                 setErrors({ ...errors, employeeNo: '形式: A1234（大文字1文字＋数字4桁）' });
             } else {
-                const newErrors = { ...errors };
-                delete newErrors.employeeNo;
-                setErrors(newErrors);
+                checkEmployeeNoDuplicate(value);
             }
+        }
+    };
+
+    // 氏名の入力制限（数字を含まない）
+    const handleNameChange = (e) => {
+        const value = e.target.value;
+        // 数字を含まない場合のみ許可
+        if (!/\d/.test(value)) {
+            setFormData({ ...formData, name: value });
+            const newErrors = { ...errors };
+            delete newErrors.name;
+            setErrors(newErrors);
+        } else {
+            setErrors({ ...errors, name: '氏名に数字は使用できません' });
+        }
+    };
+
+    // 氏名（カナ）の入力制限（カタカナのみ）
+    const handleNameKanaChange = (e) => {
+        const value = e.target.value;
+        // カタカナと長音符のみ許可
+        if (/^[ァ-ヶー]*$/.test(value)) {
+            setFormData({ ...formData, nameKana: value });
+            const newErrors = { ...errors };
+            delete newErrors.nameKana;
+            setErrors(newErrors);
+        } else {
+            setErrors({ ...errors, nameKana: 'カタカナのみ入力可能です' });
         }
     };
 
     // 電話番号の入力制限（数字のみ）
     const handlePhoneChange = (e) => {
         const value = e.target.value;
-        // 数字のみ許可
         if (/^\d*$/.test(value)) {
             setFormData({ ...formData, phone: value });
 
-            // バリデーション
             if (value && value.length < 10) {
                 setErrors({ ...errors, phone: '10桁以上の数字を入力してください' });
             } else {
@@ -70,11 +135,9 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
     // メールアドレスの入力制限とバリデーション
     const handleEmailChange = (e) => {
         const value = e.target.value;
-        // 半角英数字と特殊文字のみ許可
         if (/^[a-zA-Z0-9@.\-_]*$/.test(value)) {
             setFormData({ ...formData, email: value });
 
-            // @が含まれているかチェック
             if (value && !value.includes('@')) {
                 setErrors({ ...errors, email: '@を含む正しいメールアドレスを入力してください' });
             } else if (value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
@@ -92,24 +155,59 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // 日付フィールドの処理を修正
+        const submitData = {
+            ...formData,
+            age: parseInt(formData.age) || 0,
+            registrationDate: formData.registrationDate || null,
+            retirementDate: formData.retirementDate || null,
+        };
+
+        // 空文字を null に変換
+        Object.keys(submitData).forEach(key => {
+            if (submitData[key] === '') {
+                submitData[key] = null;
+            }
+        });
 
         // 最終バリデーション
         const validationErrors = {};
 
         // 新規登録時の社員番号チェック
-        if (mode === 'add' && !/^[A-Z][0-9]{4}$/.test(formData.employeeNo)) {
-            validationErrors.employeeNo = '社員番号は大文字1文字＋数字4桁で入力してください';
+        if (mode === 'add') {
+            if (!/^[A-Z][0-9]{4}$/.test(submitData.employeeNo)) {
+                validationErrors.employeeNo = '社員番号は大文字1文字＋数字4桁で入力してください';
+            }
+
+            // 重複チェック
+            if (!errors.employeeNo && submitData.employeeNo) {
+                await checkEmployeeNoDuplicate(submitData.employeeNo);
+                if (errors.employeeNo) {
+                    validationErrors.employeeNo = errors.employeeNo;
+                }
+            }
+        }
+
+        // 氏名チェック
+        if (/\d/.test(submitData.name)) {
+            validationErrors.name = '氏名に数字は使用できません';
+        }
+
+        // カナチェック
+        if (submitData.nameKana && !/^[ァ-ヶー]*$/.test(submitData.nameKana)) {
+            validationErrors.nameKana = 'カタカナのみ入力可能です';
         }
 
         // メールアドレスの@チェック
-        if (formData.email && !formData.email.includes('@')) {
+        if (submitData.email && !submitData.email.includes('@')) {
             validationErrors.email = '@を含む正しいメールアドレスを入力してください';
         }
 
         // 電話番号の桁数チェック
-        if (formData.phone && formData.phone.length < 10) {
+        if (submitData.phone && submitData.phone.length < 10) {
             validationErrors.phone = '電話番号は10桁以上で入力してください';
         }
 
@@ -119,7 +217,26 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
             return;
         }
 
-        onSave(formData);
+        onSave(submitData);
+
+        // 新規登録成功後はフォームをクリア
+        if (mode === 'add') {
+            setFormData({
+                employeeNo: '',
+                name: '',
+                nameKana: '',
+                department: '開発1課',
+                phone: '',
+                email: '',
+                age: 20,
+                gender: '男',
+                position: '一般',
+                pcAuthority: '利用者',
+                registrationDate: new Date().toISOString().split('T')[0],
+                retirementDate: null
+            });
+            setErrors({});
+        }
     };
 
     if (!isOpen) return null;
@@ -143,6 +260,7 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                                 required
                             />
                             {errors.employeeNo && <span className="error-text">{errors.employeeNo}</span>}
+                            {isChecking && <span className="checking-text">重複確認中...</span>}
                         </div>
 
                         <div className="form-group">
@@ -151,8 +269,10 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                                 type="text"
                                 name="name"
                                 value={formData.name}
-                                onChange={handleInputChange}
+                                onChange={handleNameChange}
+                                placeholder="山田太郎"
                             />
+                            {errors.name && <span className="error-text">{errors.name}</span>}
                         </div>
 
                         <div className="form-group">
@@ -161,8 +281,10 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                                 type="text"
                                 name="nameKana"
                                 value={formData.nameKana}
-                                onChange={handleInputChange}
+                                onChange={handleNameKanaChange}
+                                placeholder="ヤマダタロウ"
                             />
+                            {errors.nameKana && <span className="error-text">{errors.nameKana}</span>}
                         </div>
 
                         <div className="form-group">
@@ -186,7 +308,7 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handlePhoneChange}
-                                placeholder="数字のみ"
+                                placeholder="09012345678"
                                 maxLength="15"
                             />
                             {errors.phone && <span className="error-text">{errors.phone}</span>}
@@ -204,6 +326,7 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                             {errors.email && <span className="error-text">{errors.email}</span>}
                         </div>
 
+                        {/* 残りのフィールドは同じ */}
                         <div className="form-group">
                             <label>年齢</label>
                             <input
@@ -267,7 +390,7 @@ const UserModal = ({ isOpen, onClose, user, onSave, mode }) => {
                     </div>
 
                     <div className="modal-footer">
-                        <button type="submit" className="save-btn">
+                        <button type="submit" className="save-btn" disabled={isChecking}>
                             {mode === 'add' ? '登録' : '更新'}
                         </button>
                         <button type="button" className="cancel-btn" onClick={onClose}>

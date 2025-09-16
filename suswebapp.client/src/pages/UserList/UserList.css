@@ -40,7 +40,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     padding: 0 20px;
 }
 
@@ -404,7 +404,7 @@
 }
 
     .user-table-wrapper.detail-view .user-table {
-        min-width: 1400px;
+        min-width: 100px;
     }
 
 /* 検索ハイライト */

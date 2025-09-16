@@ -140,6 +140,22 @@ const UserList = ({ onBack }) => {
         try {
             const currentUserEmployeeNo = localStorage.getItem('employeeNo') || 'A1002';
 
+            // データ整形
+            const requestData = {
+                employeeNo: formData.employeeNo,
+                name: formData.name || null,
+                nameKana: formData.nameKana || null,
+                department: formData.department || null,
+                phone: formData.phone || null,
+                email: formData.email || null,
+                age: parseInt(formData.age) || 0,
+                gender: formData.gender || null,
+                position: formData.position || null,
+                pcAuthority: formData.pcAuthority || null,
+                registrationDate: formData.registrationDate ? new Date(formData.registrationDate).toISOString() : null,
+                retirementDate: formData.retirementDate ? new Date(formData.retirementDate).toISOString() : null
+            };
+
             const url = showEditModal
                 ? `/api/user/update/${formData.employeeNo}`
                 : '/api/user/create';
@@ -149,9 +165,9 @@ const UserList = ({ onBack }) => {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User-EmployeeNo': currentUserEmployeeNo  // ヘッダーに追加
+                    'X-User-EmployeeNo': currentUserEmployeeNo
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(requestData)
             });
 
             if (response.ok) {
@@ -160,6 +176,10 @@ const UserList = ({ onBack }) => {
                 setShowAddModal(false);
                 setShowEditModal(false);
                 setSelectedUser(null);
+            } else {
+                const errorData = await response.text();
+                console.error('エラー詳細:', errorData);
+                alert('保存に失敗しました');
             }
         } catch (error) {
             console.error('保存エラー:', error);
