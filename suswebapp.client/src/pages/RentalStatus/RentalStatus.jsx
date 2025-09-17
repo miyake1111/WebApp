@@ -1,61 +1,41 @@
 ﻿import React, { useState, useEffect } from 'react';
 import './RentalStatus.css';
-import RentalDetailModal from './RentalDetailModal';
+import RentalTable from './RentalTable';
 import RentalHistoryModal from './RentalHistoryModal';
+import RentalDetailModal from './RentalDetailModal';
+import RentalForm from './RentalForm';
+import ReturnForm from './ReturnForm';
 
-const RentalStatus = ({ onBack, user }) => {
+const RentalStatus = ({ onBack }) => {
     const [rentals, setRentals] = useState([]);
     const [filteredRentals, setFilteredRentals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [filter, setFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
     const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [showRentalForm, setShowRentalForm] = useState(false);
+    const [showReturnForm, setShowReturnForm] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState(null);
     const [detailView, setDetailView] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filterMode, setFilterMode] = useState('all'); // 'all', 'rented', 'available'
+    const currentUser = localStorage.getItem('employeeNo') || 'A1002';
 
     useEffect(() => {
         fetchRentalStatus();
     }, []);
 
-    useEffect(() => {
-        // フィルターと検索を適用
-        let filtered = [...rentals];
-
-        // フィルターモードの適用
-        if (filterMode === 'rented') {
-            filtered = filtered.filter(rental => !rental.availableFlag);
-        } else if (filterMode === 'available') {
-            filtered = filtered.filter(rental => rental.availableFlag);
-        }
-
-        // 検索フィルタリング
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(rental => {
-                return (
-                    rental.assetNo?.toLowerCase().includes(query) ||
-                    rental.maker?.toLowerCase().includes(query) ||
-                    rental.os?.toLowerCase().includes(query) ||
-                    rental.location?.toLowerCase().includes(query) ||
-                    rental.employeeNo?.toLowerCase().includes(query) ||
-                    rental.employeeName?.toLowerCase().includes(query) ||
-                    rental.department?.toLowerCase().includes(query)
-                );
-            });
-        }
-
-        setFilteredRentals(filtered);
-    }, [searchQuery, rentals, filterMode]);
-
     const fetchRentalStatus = async () => {
         try {
+            setLoading(true);
             const response = await fetch('/api/rental/status');
             const data = await response.json();
-            if (data.success) {
-                setRentals(data.data);
-                setFilteredRentals(data.data);
-            }
+
+            const sortedRentals = data.sort((a, b) => {
+                return a.assetNo.localeCompare(b.assetNo);
+            });
+
+            setRentals(sortedRentals);
+            setFilteredRentals(sortedRentals);
         } catch (error) {
             console.error('貸出状況の取得エラー:', error);
         } finally {
@@ -63,15 +43,30 @@ const RentalStatus = ({ onBack, user }) => {
         }
     };
 
-    const handleAssetClick = (device) => {
-        setSelectedDevice(device);
-        setShowDetailModal(true);
-    };
+    useEffect(() => {
+        let filtered = [...rentals];
 
-    const handleDetailModalSuccess = () => {
-        setShowDetailModal(false);
-        fetchRentalStatus();
-    };
+        // フィルター適用
+        if (filter === 'available') {
+            filtered = filtered.filter(r => r.availableFlag === true);
+        } else if (filter === 'rented') {
+            filtered = filtered.filter(r => r.availableFlag === false);
+        } else if (filter === 'overdue') {
+            filtered = filtered.filter(r => r.isOverdue === true);
+        }
+
+        // 検索適用
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(rental => {
+                return Object.values(rental).some(value =>
+                    value && value.toString().toLowerCase().includes(query)
+                );
+            });
+        }
+
+        setFilteredRentals(filtered);
+    }, [filter, searchQuery, rentals]);
 
     const handleSearch = () => {
         // searchQueryの変更でuseEffectが動作
@@ -79,6 +74,16 @@ const RentalStatus = ({ onBack, user }) => {
 
     const handleClearSearch = () => {
         setSearchQuery('');
+    };
+
+    const handleShowHistory = (rental) => {
+        setSelectedDevice(rental);
+        setShowHistoryModal(true);
+    };
+
+    const handleShowDetail = (rental) => {
+        setSelectedDevice(rental);
+        setShowDetailModal(true);
     };
 
     const toggleDetailView = () => {
@@ -93,45 +98,97 @@ const RentalStatus = ({ onBack, user }) => {
         return <span className="highlight">{text}</span>;
     };
 
-    // 件数を計算
-    const allCount = rentals.length;
-    const rentedCount = rentals.filter(r => !r.availableFlag).length;
-    const availableCount = rentals.filter(r => r.availableFlag).length;
+    const handleRent = async (formData) => {
+        try {
+            console.log('送信する貸出データ:', formData);
+
+            const response = await fetch('/api/rental/rent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    assetNo: formData.assetNo,
+                    employeeNo: formData.employeeNo,
+                    rentalDate: formData.rentalDate,
+                    dueDate: formData.dueDate
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('貸出処理が完了しました');
+                fetchRentalStatus();
+                setShowDetailModal(false);
+            } else {
+                alert(result.message || '貸出処理に失敗しました');
+            }
+        } catch (error) {
+            console.error('貸出エラー:', error);
+            alert('貸出処理に失敗しました');
+        }
+    };
+
+    const handleReturn = async (formData) => {
+        try {
+            const response = await fetch('/api/rental/return', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                alert('返却処理が完了しました');
+                fetchRentalStatus();
+                setShowReturnForm(false);
+                setShowDetailModal(false);
+            }
+        } catch (error) {
+            console.error('返却エラー:', error);
+            alert('返却処理に失敗しました');
+        }
+    };
 
     return (
         <div className="rental-status-container">
             <div className="rental-status-header">
                 <h2>貸出状況一覧</h2>
-                <div className="header-buttons">
-                    {/* フィルターボタングループ */}
-                    <div className="filter-button-group">
-                        <button
-                            className={`filter-button ${filterMode === 'all' ? 'active' : ''}`}
-                            onClick={() => setFilterMode('all')}
-                        >
-                            No順 ({allCount})
-                        </button>
-                        <button
-                            className={`filter-button ${filterMode === 'rented' ? 'active' : ''}`}
-                            onClick={() => setFilterMode('rented')}
-                        >
-                            貸出中 ({rentedCount})
-                        </button>
-                        <button
-                            className={`filter-button ${filterMode === 'available' ? 'active' : ''}`}
-                            onClick={() => setFilterMode('available')}
-                        >
-                            空き ({availableCount})
-                        </button>
-                    </div>
-                    <button className="back-btn" onClick={onBack}>
-                        メニューに戻る
-                    </button>
-                </div>
+                <button className="back-btn" onClick={onBack}>
+                    メニューに戻る
+                </button>
             </div>
 
-            {/* コントロール部分 */}
             <div className="controls-container">
+                <div className="filter-buttons-group">
+                    <button
+                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                        onClick={() => setFilter('all')}
+                    >
+                        すべて
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'available' ? 'active' : ''}`}
+                        onClick={() => setFilter('available')}
+                    >
+                        空き
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'rented' ? 'active' : ''}`}
+                        onClick={() => setFilter('rented')}
+                    >
+                        貸出中
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'overdue' ? 'active' : ''}`}
+                        onClick={() => setFilter('overdue')}
+                    >
+                        期限超過
+                    </button>
+                </div>
+
                 <div className="search-group">
                     <button
                         className="clear-search-btn"
@@ -175,70 +232,16 @@ const RentalStatus = ({ onBack, user }) => {
                 <>
                     <div className="rental-table-container">
                         <div className={`rental-table-wrapper ${detailView ? 'detail-view' : ''}`}>
-                            <table className="rental-table">
-                                <thead>
-                                    <tr>
-                                        <th>NO</th>
-                                        <th>資産番号</th>
-                                        <th>メーカー</th>
-                                        <th>OS</th>
-                                        <th>保管場所</th>
-                                        <th>空き</th>
-                                        <th>使用者</th>
-                                        <th>社員氏名</th>
-                                        <th>貸出日</th>
-                                        <th>返却締切日</th>
-                                        {detailView && (
-                                            <>
-                                                <th>返却日</th>
-                                                <th>備考</th>
-                                            </>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredRentals.map((rental, index) => {
-                                        const isRented = !rental.availableFlag;
-                                        const rowClass = rental.isOverdue ? 'overdue-row' :
-                                            rental.brokenFlag ? 'broken-row' : '';
-
-                                        return (
-                                            <tr key={rental.assetNo} className={rowClass}>
-                                                <td>{index + 1}</td>
-                                                <td>
-                                                    <span
-                                                        className="asset-link"
-                                                        onClick={() => handleAssetClick(rental)}
-                                                    >
-                                                        {highlightText(rental.assetNo, searchQuery)}
-                                                    </span>
-                                                </td>
-                                                <td>{highlightText(rental.maker || '-', searchQuery)}</td>
-                                                <td>{highlightText(rental.os || '-', searchQuery)}</td>
-                                                <td>{highlightText(rental.location || '-', searchQuery)}</td>
-                                                <td>
-                                                    {isRented ?
-                                                        <span className="status-rented">貸出中</span> :
-                                                        <span className="status-available">◯</span>
-                                                    }
-                                                </td>
-                                                <td>{highlightText(rental.employeeNo || '-', searchQuery)}</td>
-                                                <td>{highlightText(rental.employeeName || '-', searchQuery)}</td>
-                                                <td>{rental.rentalDate || '-'}</td>
-                                                <td className={rental.isOverdue ? 'text-danger' : ''}>
-                                                    {rental.dueDate || '-'}
-                                                </td>
-                                                {detailView && (
-                                                    <>
-                                                        <td>{rental.returnDate || '-'}</td>
-                                                        <td>{highlightText(rental.remarks || '-', searchQuery)}</td>
-                                                    </>
-                                                )}
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                            <RentalTable
+                                rentals={filteredRentals}
+                                onShowHistory={handleShowHistory}
+                                onShowDetail={handleShowDetail}
+                                onRent={handleRent}
+                                onReturn={handleReturn}
+                                detailView={detailView}
+                                searchQuery={searchQuery}
+                                highlightText={highlightText}
+                            />
                         </div>
 
                         <div className="table-footer">
@@ -260,21 +263,39 @@ const RentalStatus = ({ onBack, user }) => {
                 </>
             )}
 
-            {showDetailModal && (
-                <RentalDetailModal
-                    isOpen={showDetailModal}
-                    onClose={() => setShowDetailModal(false)}
-                    device={selectedDevice}
-                    currentUser={user}
-                    onSuccess={handleDetailModalSuccess}
+            {showHistoryModal && (
+                <RentalHistoryModal
+                    isOpen={showHistoryModal}
+                    onClose={() => setShowHistoryModal(false)}
+                    currentUser={currentUser}
                 />
             )}
 
-            <RentalHistoryModal
-                isOpen={showHistoryModal}
-                onClose={() => setShowHistoryModal(false)}
-                currentUser={user}
-            />
+            {showDetailModal && selectedDevice && (
+                <RentalDetailModal
+                    device={selectedDevice}
+                    onClose={() => setShowDetailModal(false)}
+                    onRent={handleRent}
+                    onReturn={handleReturn}
+                    currentUser={currentUser}
+                />
+            )}
+
+            {showRentalForm && selectedDevice && (
+                <RentalForm
+                    device={selectedDevice}
+                    onSubmit={handleRent}
+                    onClose={() => setShowRentalForm(false)}
+                />
+            )}
+
+            {showReturnForm && selectedDevice && (
+                <ReturnForm
+                    device={selectedDevice}
+                    onSubmit={handleReturn}
+                    onClose={() => setShowReturnForm(false)}
+                />
+            )}
         </div>
     );
 };

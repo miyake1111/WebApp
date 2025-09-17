@@ -1,4 +1,6 @@
-﻿.rental-status-container {
+﻿/* RentalStatus.css - UserListデザイン統一版 */
+
+.rental-status-container {
     padding: 30px;
     height: 100vh;
     background-color: #f5f5f5;
@@ -18,6 +20,7 @@
     .rental-status-header h2 {
         font-size: 28px;
         color: #333;
+        margin: 0;
     }
 
 .back-btn {
@@ -34,29 +37,61 @@
         background-color: #7f8c8d;
     }
 
-/* コントロール部分 */
+/* コントロール全体のコンテナ */
 .controls-container {
     display: flex;
     align-items: flex-end;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     padding: 0 20px;
 }
 
+/* 左側グループ（フィルター） */
+.filter-buttons-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* 右側グループ（検索関連） */
 .search-group {
     display: flex;
     align-items: flex-end;
     gap: 10px;
-    margin-left: auto;
 }
 
+/* 検索と履歴ボタンを縦に配置 */
 .search-history-buttons {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
+/* フィルターボタン */
+.filter-btn {
+    padding: 6px 16px;
+    height: 36px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+    .filter-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .filter-btn.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+/* 検索関連ボタン */
 .clear-search-btn,
 .search-btn,
 .history-btn {
@@ -71,6 +106,7 @@
     justify-content: center;
     font-size: 18px;
     transition: all 0.2s ease;
+    color: #000000;
 }
 
     .clear-search-btn:hover,
@@ -80,6 +116,7 @@
         transform: scale(1.05);
     }
 
+/* 検索入力 */
 .search-input {
     width: 300px;
     padding: 6px 12px;
@@ -95,7 +132,7 @@
         border-color: #3498db;
     }
 
-/* テーブルコンテナ */
+/* テーブルコンテナ全体 */
 .rental-table-container {
     flex: 1;
     background-color: white;
@@ -108,24 +145,22 @@
     margin-top: 20px;
 }
 
+/* テーブルラッパー */
 .rental-table-wrapper {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: auto;
     padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
 }
 
-    .rental-table-wrapper.detail-view {
-        overflow-x: auto;
-    }
-
-        .rental-table-wrapper.detail-view .rental-table {
-            min-width: 1400px;
-        }
-
+/* テーブル */
 .rental-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 1200px;
 }
 
     .rental-table thead {
@@ -150,7 +185,7 @@
         color: #2c3e50;
     }
 
-    .rental-table tr:hover {
+    .rental-table tbody tr:hover {
         background-color: #f8f9fa;
     }
 
@@ -158,8 +193,12 @@
 .asset-link {
     color: #3498db;
     cursor: pointer;
-    text-decoration: underline;
+    text-decoration: none;
     font-weight: 500;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
     transition: color 0.2s ease;
 }
 
@@ -168,10 +207,15 @@
         text-decoration: underline;
     }
 
-/* ステータス表示 */
+/* ステータスセル */
+.status-cell {
+    text-align: center;
+}
+
 .status-available {
     color: #27ae60;
     font-weight: bold;
+    font-size: 1.2rem;
 }
 
 .status-rented {
@@ -179,24 +223,49 @@
     font-weight: bold;
 }
 
-/* 期限切れ行 */
+/* アクションセル */
+.action-cell {
+    text-align: center;
+}
+
+.btn-history {
+    padding: 6px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+    .btn-history:hover {
+        background-color: #5a6268;
+        transform: translateY(-1px);
+    }
+
+/* 期限超過の行 */
 .overdue-row {
     background-color: #ffe5e5;
 }
 
-    .overdue-row:hover {
-        background-color: #ffcccc;
-    }
+/* 故障機器の行 */
+.broken-row {
+    background-color: #f0f0f0;
+    opacity: 0.8;
+}
 
+/* 危険テキスト */
 .text-danger {
     color: #e74c3c;
     font-weight: bold;
 }
 
-/* 故障機器行 */
-.broken-row {
-    background-color: #f0f0f0;
-    opacity: 0.7;
+/* データなし */
+.no-data {
+    text-align: center;
+    color: #6c757d;
+    padding: 50px !important;
 }
 
 /* テーブルフッター */
@@ -208,6 +277,7 @@
     flex-shrink: 0;
     display: flex;
     justify-content: flex-start;
+    align-items: center;
 }
 
 .record-count {
@@ -215,6 +285,82 @@
     color: #6c757d;
     font-weight: 500;
 }
+
+/* 検索ハイライト */
+.highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* スクロールバーのスタイル */
+.rental-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.rental-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.rental-table-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    .rental-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* ローディング */
+.loading {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+/* モーダルオーバーレイ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* レスポンシブ対応 */
+@media (max-height: 600px) {
+    .rental-status-container {
+        padding: 15px;
+    }
+
+    .rental-status-header {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .rental-table-wrapper {
+        max-width: calc(100vw - 40px);
+    }
+}
+
+/* 詳細ビュー時のスタイル */
+.rental-table-wrapper.detail-view {
+    overflow-x: auto;
+}
+
+    .rental-table-wrapper.detail-view .rental-table {
+        min-width: 1400px;
+    }
 
 /* 詳細ボタンコンテナ */
 .detail-button-container {
@@ -245,137 +391,10 @@
         transform: scale(1.1);
     }
 
+/* ハイライトスタイル */
 .highlight {
     background-color: #fff3cd;
     padding: 2px 4px;
     border-radius: 3px;
     font-weight: 600;
-}
-
-.loading {
-    text-align: center;
-    padding: 50px;
-    font-size: 18px;
-    color: #7f8c8d;
-}
-
-/* スクロールバー */
-.rental-table-wrapper::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-}
-
-.rental-table-wrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.rental-table-wrapper::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-    .rental-table-wrapper::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-    .rental-status-container {
-        padding: 15px;
-    }
-
-    .rental-status-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-
-    .controls-container {
-        justify-content: center;
-        padding: 0 10px;
-    }
-
-    .search-input {
-        width: 200px;
-    }
-
-    .rental-table-wrapper {
-        overflow-x: auto;
-    }
-
-    .rental-table {
-        min-width: 800px;
-    }
-}
-
-@media (max-width: 480px) {
-    .rental-status-container {
-        padding: 10px;
-    }
-
-    .rental-status-header h2 {
-        font-size: 24px;
-    }
-
-    .search-group {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .search-input {
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-/* ヘッダーボタングループ */
-.header-buttons {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.filter-button-group {
-    display: flex;
-    gap: 5px;
-    background-color: white;
-    padding: 3px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.filter-button {
-    padding: 8px 16px;
-    background-color: transparent;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #666;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-    .filter-button:hover {
-        background-color: #f0f0f0;
-    }
-
-    .filter-button.active {
-        background-color: #3498db;
-        color: white;
-    }
-
-/* レスポンシブ対応の修正 */
-@media (max-width: 768px) {
-    .header-buttons {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-    }
-
-    .filter-button-group {
-        width: 100%;
-        justify-content: center;
-    }
 }

@@ -1,0 +1,13 @@
+﻿/* ReturnForm.css */
+.return-form-modal {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 他のスタイルはRentalForm.cssと共通なので省略または共通化可能 */

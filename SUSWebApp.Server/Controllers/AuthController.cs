@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace SUSWebApp.Server.Controllers
 {
@@ -9,11 +8,12 @@ namespace SUSWebApp.Server.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly NpgsqlConnection _connection;
+        private readonly string _connectionString;
 
-        public AuthController(NpgsqlConnection connection)
+        public AuthController(IConfiguration configuration)
         {
-            _connection = connection;
+            _connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         [HttpPost("login")]
@@ -21,33 +21,43 @@ namespace SUSWebApp.Server.Controllers
         {
             try
             {
-                await _connection.OpenAsync();
+                using var connection = new NpgsqlConnection(_connectionString);
+                await connection.OpenAsync();
 
                 // AUTH_USERテーブルでパスワード確認
                 string authQuery = @"
-                    SELECT employee_no 
-                    FROM ""AUTH_USER"" 
-                    WHERE employee_no = @employeeNo AND password = @password";
+            SELECT employee_no, password 
+            FROM ""AUTH_USER"" 
+            WHERE employee_no = @employeeNo";
 
-                using var authCmd = new NpgsqlCommand(authQuery, _connection);
-                authCmd.Parameters.AddWithValue("employeeNo", request.EmployeeNo);
-                authCmd.Parameters.AddWithValue("password", request.Password);
+                using var authCmd = new NpgsqlCommand(authQuery, connection);
+                authCmd.Parameters.AddWithValue("@employeeNo", request.EmployeeNo);
 
-                var authResult = await authCmd.ExecuteScalarAsync();
-
-                if (authResult == null)
+                string? dbPassword = null;
+                using (var authReader = await authCmd.ExecuteReaderAsync())
                 {
-                    return BadRequest(new { message = "社員番号またはパスワードが正しくありません" });
+                    if (!await authReader.ReadAsync())
+                    {
+                        return BadRequest(new { message = "社員番号が見つかりません" });
+                    }
+                    dbPassword = authReader["password"]?.ToString();
                 }
 
-                // MST_USERテーブルからユーザー詳細情報を取得（カラム名を修正）
-                string userQuery = @"
-                    SELECT employee_no, name, department, position, pc_account_auth 
-                    FROM ""MST_USER"" 
-                    WHERE employee_no = @employeeNo AND is_deleted = false";
+                // パスワードの検証
+                if (string.IsNullOrEmpty(dbPassword) || dbPassword != request.Password)
+                {
+                    return BadRequest(new { message = "パスワードが正しくありません" });
+                }
 
-                using var userCmd = new NpgsqlCommand(userQuery, _connection);
-                userCmd.Parameters.AddWithValue("employeeNo", request.EmployeeNo);
+                // MST_USERテーブルからユーザー詳細情報を取得（正しいカラム名に修正）
+                string userQuery = @"
+            SELECT employee_no, name, department, position, pc_account_auth 
+            FROM ""MST_USER"" 
+            WHERE employee_no = @employeeNo 
+            AND is_deleted = false";  // ← ここを修正
+
+                using var userCmd = new NpgsqlCommand(userQuery, connection);
+                userCmd.Parameters.AddWithValue("@employeeNo", request.EmployeeNo);
 
                 using var reader = await userCmd.ExecuteReaderAsync();
 
@@ -55,11 +65,11 @@ namespace SUSWebApp.Server.Controllers
                 {
                     var userInfo = new
                     {
-                        employeeNo = reader.GetString(0),
-                        name = reader.GetString(1),
-                        department = reader.GetString(2),
-                        position = reader.GetString(3),
-                        accountLevel = reader.GetString(4)  // pc_account_auth の値
+                        employeeNo = reader["employee_no"]?.ToString() ?? "",
+                        name = reader["name"]?.ToString() ?? "",
+                        department = reader["department"]?.ToString() ?? "",
+                        position = reader["position"]?.ToString() ?? "",
+                        accountLevel = reader["pc_account_auth"]?.ToString() ?? ""
                     };
 
                     return Ok(new
@@ -76,11 +86,8 @@ namespace SUSWebApp.Server.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"ログインエラー: {ex.Message}");
                 return StatusCode(500, new { message = $"サーバーエラー: {ex.Message}" });
-            }
-            finally
-            {
-                await _connection.CloseAsync();
             }
         }
 
@@ -89,25 +96,37 @@ namespace SUSWebApp.Server.Controllers
         {
             try
             {
-                using var connection = new NpgsqlConnection(_connection.ConnectionString);
+                using var connection = new NpgsqlConnection(_connectionString);
                 await connection.OpenAsync();
 
-                var authCountCmd = new NpgsqlCommand(@"SELECT COUNT(*) FROM ""AUTH_USER""", connection);
-                var authCount = await authCountCmd.ExecuteScalarAsync();
+                var checkTablesQuery = @"
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name IN ('AUTH_USER', 'MST_USER')";
 
-                var userCountCmd = new NpgsqlCommand(@"SELECT COUNT(*) FROM ""MST_USER"" WHERE is_deleted = false", connection);
-                var userCount = await userCountCmd.ExecuteScalarAsync();
+                using var cmd = new NpgsqlCommand(checkTablesQuery, connection);
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                var tables = new List<string>();
+                while (await reader.ReadAsync())
+                {
+                    var tableName = reader["table_name"]?.ToString();
+                    if (!string.IsNullOrEmpty(tableName))
+                    {
+                        tables.Add(tableName);
+                    }
+                }
 
                 return Ok(new
                 {
-                    authUsers = authCount,
-                    activeUsers = userCount,
-                    message = "データベース接続成功"
+                    message = "接続成功",
+                    existingTables = tables
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"データベース接続エラー: {ex.Message}" });
+                return StatusCode(500, new { message = $"接続エラー: {ex.Message}" });
             }
         }
     }

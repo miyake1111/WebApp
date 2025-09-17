@@ -1,228 +1,205 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using System.Data;
-using SUSWebApp.Server.Data;
-using SUSWebApp.Server.Models.DTOs;
-using SUSWebApp.Server.Models.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SUSWebApp.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class RentalController : ControllerBase
     {
         private readonly string _connectionString;
-        private readonly ApplicationDbContext _context;
 
-        public RentalController(IConfiguration configuration, ApplicationDbContext context)  // contextパラメータ追加
+        public RentalController(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                               "Host=localhost;Database=postgres;Username=postgres;Password=ms369369";
-            _context = context;  // 正しく代入
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        // 貸出状況一覧を取得（全機器：空き・貸出中両方）
-        [HttpGet("status")]
-        public async Task<IActionResult> GetRentalStatus()
-        {
-            try
-            {
-                var rentalList = new List<object>();
-
-                using (var connection = new NpgsqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-
-                    // 全機器を取得し、貸出情報があれば結合
-                    var query = @"
-                        SELECT 
-                            d.asset_no,
-                            d.manufacturer,
-                            d.os,
-                            d.storage_location,
-                            r.rental_id,
-                            r.employee_no,
-                            u.name as employee_name,
-                            u.department,
-                            r.rental_date,
-                            r.due_date,
-                            r.return_date,
-                            r.available_flag,
-                            d.is_broken,
-                            r.remarks
-                        FROM ""MST_DEVICE"" d
-                        LEFT JOIN ""TRN_RENTAL"" r ON d.asset_no = r.asset_no AND r.available_flag = false
-                        LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
-                        WHERE d.is_deleted = false
-                        ORDER BY d.asset_no ASC";
-
-                    using (var cmd = new NpgsqlCommand(query, connection))
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            // 期限超過チェック
-                            bool isOverdue = false;
-                            if (!reader.IsDBNull(9))
-                            {
-                                isOverdue = reader.GetDateTime(9) < DateTime.Today;
-                            }
-
-                            rentalList.Add(new
-                            {
-                                assetNo = reader.GetString(0),
-                                maker = reader.IsDBNull(1) ? "" : reader.GetString(1),
-                                os = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                                location = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                                rentalId = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
-                                employeeNo = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                                employeeName = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                                department = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                                rentalDate = reader.IsDBNull(8) ? "" : reader.GetDateTime(8).ToString("yyyy-MM-dd"),
-                                dueDate = reader.IsDBNull(9) ? "" : reader.GetDateTime(9).ToString("yyyy-MM-dd"),
-                                returnDate = reader.IsDBNull(10) ? "" : reader.GetDateTime(10).ToString("yyyy-MM-dd"),
-                                availableFlag = reader.IsDBNull(11) ? true : reader.GetBoolean(11),
-                                brokenFlag = reader.IsDBNull(12) ? false : reader.GetBoolean(12),
-                                remarks = reader.IsDBNull(13) ? "" : reader.GetString(13),
-                                isOverdue = isOverdue
-                            });
-                        }
-                    }
-                }
-
-                return Ok(new
-                {
-                    success = true,
-                    data = rentalList,
-                    totalCount = rentalList.Count,
-                    message = $"全機器: {rentalList.Count}件"
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = $"エラー: {ex.Message}" });
-            }
-        }
-
-        // 貸出処理
         [HttpPost("rent")]
-        public async Task<IActionResult> RentDevice([FromBody] RentalRequest request)
+        public IActionResult RentDevice([FromBody] RentalRequest request)
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                using var transaction = connection.BeginTransaction();
+
+                try
                 {
-                    await connection.OpenAsync();
+                    // まず機器が貸出可能か確認
+                    var checkAvailabilityQuery = @"
+                SELECT available_flag 
+                FROM ""TRN_RENTAL""
+                WHERE asset_no = @AssetNo";
 
-                    // トランザクション開始
-                    using (var transaction = await connection.BeginTransactionAsync())
+                    bool isAvailable = false;
+                    using (var cmd = new NpgsqlCommand(checkAvailabilityQuery, connection, transaction))
                     {
-                        try
+                        cmd.Parameters.AddWithValue("@AssetNo", request.AssetNo);
+                        var result = cmd.ExecuteScalar();
+                        if (result != null)
                         {
-                            // まず機器が貸出可能か確認（返却されていない貸出レコードがあるか）
-                            var checkQuery = @"
-                                SELECT COUNT(*) 
-                                FROM ""TRN_RENTAL"" 
-                                WHERE asset_no = @assetNo 
-                                AND (return_date IS NULL OR available_flag = false)";
-
-                            using (var checkCmd = new NpgsqlCommand(checkQuery, connection, transaction))
-                            {
-                                checkCmd.Parameters.AddWithValue("assetNo", request.AssetNo);
-                                var count = Convert.ToInt32(await checkCmd.ExecuteScalarAsync());
-
-                                if (count > 0)
-                                {
-                                    await transaction.RollbackAsync();
-                                    return BadRequest(new { success = false, message = "この機器は既に貸出中です" });
-                                }
-                            }
-
-                            // 貸出登録（rental_idは自動生成）
-                            var insertQuery = @"
-                                INSERT INTO ""TRN_RENTAL"" 
-                                (asset_no, employee_no, rental_date, due_date, available_flag, remarks)
-                                VALUES 
-                                (@assetNo, @employeeNo, @rentalDate, @dueDate, false, @remarks)
-                                RETURNING rental_id";
-
-                            using (var cmd = new NpgsqlCommand(insertQuery, connection, transaction))
-                            {
-                                cmd.Parameters.AddWithValue("assetNo", request.AssetNo);
-                                cmd.Parameters.AddWithValue("employeeNo", request.EmployeeNo);
-                                cmd.Parameters.AddWithValue("rentalDate", DateTime.Parse(request.RentalDate));
-                                cmd.Parameters.AddWithValue("dueDate", DateTime.Parse(request.DueDate));
-                                cmd.Parameters.AddWithValue("remarks", string.IsNullOrEmpty(request.Remarks) ? "" : request.Remarks);
-
-                                var rentalId = await cmd.ExecuteScalarAsync();
-
-                                await transaction.CommitAsync();
-
-                                return Ok(new
-                                {
-                                    success = true,
-                                    message = "貸出処理が完了しました",
-                                    rentalId = rentalId
-                                });
-                            }
-                        }
-                        catch
-                        {
-                            await transaction.RollbackAsync();
-                            throw;
+                            isAvailable = Convert.ToBoolean(result);
                         }
                     }
+
+                    if (!isAvailable)
+                    {
+                        transaction.Rollback();
+                        return BadRequest(new { success = false, message = "この機器は貸出できません" });
+                    }
+
+                    // TRN_RENTALの更新（正しい日付形式で）
+                    var updateQuery = @"
+                UPDATE ""TRN_RENTAL""
+                SET employee_no = @EmployeeNo,
+                    rental_date = CURRENT_DATE,
+                    due_date = @DueDate::date,
+                    return_date = NULL,
+                    available_flag = FALSE
+                WHERE asset_no = @AssetNo 
+                AND available_flag = TRUE";
+
+                    using (var cmd = new NpgsqlCommand(updateQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@AssetNo", request.AssetNo);
+                        cmd.Parameters.AddWithValue("@EmployeeNo", request.EmployeeNo);
+                        cmd.Parameters.AddWithValue("@DueDate", request.DueDate);
+
+                        var updateResult = cmd.ExecuteNonQuery();
+                        if (updateResult == 0)
+                        {
+                            transaction.Rollback();
+                            return BadRequest(new { success = false, message = "貸出処理に失敗しました" });
+                        }
+                    }
+
+                    transaction.Commit();
+                    return Ok(new { success = true, message = "貸出処理が完了しました" });
                 }
-            }
-            catch (NpgsqlException npgEx) when (npgEx.SqlState == "23505")  // 重複キーエラー
-            {
-                return BadRequest(new
+                catch (Exception ex)
                 {
-                    success = false,
-                    message = "この機器は既に貸出処理中です。画面を更新してください。"
-                });
+                    transaction.Rollback();
+                    Console.WriteLine($"貸出エラー: {ex.Message}");
+                    throw;
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = $"貸出処理でエラーが発生しました: {ex.Message}"
-                });
+                Console.WriteLine($"貸出処理エラー: {ex.Message}");
+                return StatusCode(500, new { success = false, message = $"エラー: {ex.Message}" });
             }
         }
 
-        // 返却処理
-        [HttpPost("return/{rentalId}")]
-        public async Task<IActionResult> ReturnDevice(int rentalId)
+        [HttpPost("return")]
+        public IActionResult ReturnDevice([FromBody] ReturnRequest request)
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                using var transaction = connection.BeginTransaction();
+
+                try
                 {
-                    await connection.OpenAsync();
+                    // 現在の貸出情報を取得
+                    string employeeNo = null;
+                    string employeeName = null;
+                    DateTime? rentalDate = null;
+                    DateTime? dueDate = null;
 
-                    var query = @"
-                        UPDATE ""TRN_RENTAL"" 
-                        SET available_flag = true, 
-                            return_date = @returnDate
-                        WHERE rental_id = @rentalId";
+                    var getCurrentRentalQuery = @"
+                SELECT r.employee_no, r.rental_date, r.due_date, u.name as employee_name
+                FROM ""TRN_RENTAL"" r
+                LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
+                WHERE r.asset_no = @AssetNo 
+                AND r.available_flag = FALSE
+                AND r.return_date IS NULL";
 
-                    using (var cmd = new NpgsqlCommand(query, connection))
+                    using (var cmd = new NpgsqlCommand(getCurrentRentalQuery, connection, transaction))
                     {
-                        cmd.Parameters.AddWithValue("rentalId", rentalId);
-                        cmd.Parameters.AddWithValue("returnDate", DateTime.Now);
-
-                        var affected = await cmd.ExecuteNonQueryAsync();
-
-                        if (affected > 0)
+                        cmd.Parameters.AddWithValue("@AssetNo", request.AssetNo);
+                        using var reader = cmd.ExecuteReader();
+                        if (reader.Read())
                         {
-                            return Ok(new { success = true, message = "返却処理が完了しました" });
+                            employeeNo = reader["employee_no"]?.ToString();
+                            employeeName = reader["employee_name"]?.ToString();
+                            rentalDate = reader["rental_date"] as DateTime?;
+                            dueDate = reader["due_date"] as DateTime?;
                         }
-
-                        return BadRequest(new { success = false, message = "返却処理に失敗しました" });
+                        else
+                        {
+                            return BadRequest(new { success = false, message = "貸出中の機器が見つかりません" });
+                        }
                     }
+
+                    // TRN_RENTALの更新（空きフラグと返却日のみ更新）
+                    var updateQuery = @"
+                UPDATE ""TRN_RENTAL""
+                SET available_flag = TRUE,
+                    return_date = CURRENT_DATE
+                WHERE asset_no = @AssetNo 
+                AND available_flag = FALSE
+                AND return_date IS NULL";
+
+                    using (var cmd = new NpgsqlCommand(updateQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@AssetNo", request.AssetNo);
+
+                        var updateResult = cmd.ExecuteNonQuery();
+                        if (updateResult == 0)
+                        {
+                            transaction.Rollback();
+                            return BadRequest(new { success = false, message = "返却処理に失敗しました" });
+                        }
+                    }
+
+                    // HST_RENTAL_CHANGEに返却履歴を記録（カラム名を小文字に）
+                    var changeHistoryQuery = @"
+                INSERT INTO ""HST_RENTAL_CHANGE"" 
+                (change_date, change_type, asset_no, employee_no_before, employee_no_after, 
+                 rental_date_before, rental_date_after, due_date_before, due_date_after,
+                 return_date_after, changed_by_employee_no)
+                VALUES 
+                (CURRENT_TIMESTAMP, '返却', @AssetNo, @EmployeeNoBefore, @EmployeeNoBefore,
+                 @RentalDateBefore, @RentalDateBefore, @DueDateBefore, @DueDateBefore,
+                 CURRENT_DATE, @ChangedBy)";
+
+                    using (var cmd = new NpgsqlCommand(changeHistoryQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@AssetNo", request.AssetNo);
+                        cmd.Parameters.AddWithValue("@EmployeeNoBefore", (object)employeeNo ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@RentalDateBefore", (object)rentalDate ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@DueDateBefore", (object)dueDate ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@ChangedBy", request.EmployeeNo ?? "SYSTEM");
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "返却処理が完了しました",
+                        returnInfo = new
+                        {
+                            assetNo = request.AssetNo,
+                            returnDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                            returnedBy = employeeNo,
+                            returnedByName = employeeName
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine($"返却エラー詳細: {ex.Message}");
+                    throw;
                 }
             }
             catch (Exception ex)
@@ -231,114 +208,249 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 特定ユーザーの現在の貸出情報を取得
+        [HttpGet("status")]
+        public IActionResult GetRentalStatus()
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                var query = @"
+            SELECT 
+                r.rental_id,
+                r.asset_no,
+                d.manufacturer as maker,
+                d.os,
+                d.memory,
+                d.storage,
+                d.graphics_card as graphicsCard,
+                d.storage_location as storageLocation,
+                d.is_broken as malfunction,
+                r.available_flag as availableFlag,
+                r.employee_no as employeeNo,
+                u.name as employeeName,
+                u.department,
+                TO_CHAR(r.rental_date, 'YYYY-MM-DD') as rentalDate,
+                TO_CHAR(r.due_date, 'YYYY-MM-DD') as dueDate,
+                TO_CHAR(r.return_date, 'YYYY-MM-DD') as returnDate,
+                TO_CHAR(r.inventory_date, 'YYYY-MM-DD HH24:MI:SS') as inventoryDate,
+                r.remarks as rentalRemarks,
+                d.remarks as deviceRemarks,
+                CASE 
+                    WHEN r.available_flag = FALSE AND r.due_date < CURRENT_DATE 
+                    THEN true 
+                    ELSE false 
+                END as isOverdue
+            FROM ""TRN_RENTAL"" r
+            INNER JOIN ""MST_DEVICE"" d ON r.asset_no = d.asset_no
+            LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
+            WHERE d.is_deleted = FALSE
+            ORDER BY r.asset_no";
+
+                var rentals = new List<object>();
+
+                using (var cmd = new NpgsqlCommand(query, connection))
+                {
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        rentals.Add(new
+                        {
+                            rentalId = reader["rental_id"],
+                            assetNo = reader["asset_no"]?.ToString(),
+                            maker = reader["maker"]?.ToString(),
+                            os = reader["os"]?.ToString(),
+                            memory = reader["memory"],
+                            storage = reader["storage"],
+                            graphicsCard = reader["graphicsCard"]?.ToString(),
+                            storageLocation = reader["storageLocation"]?.ToString(),
+                            malfunction = Convert.ToBoolean(reader["malfunction"]),
+                            availableFlag = Convert.ToBoolean(reader["availableFlag"]),
+                            employeeNo = reader["employeeNo"]?.ToString(),
+                            employeeName = reader["employeeName"]?.ToString(),
+                            department = reader["department"]?.ToString(),
+                            rentalDate = reader["rentalDate"]?.ToString(),
+                            dueDate = reader["dueDate"]?.ToString(),
+                            returnDate = reader["returnDate"]?.ToString(),
+                            inventoryDate = reader["inventoryDate"]?.ToString(),
+                            rentalRemarks = reader["rentalRemarks"]?.ToString(),
+                            deviceRemarks = reader["deviceRemarks"]?.ToString(),
+                            isOverdue = Convert.ToBoolean(reader["isOverdue"])
+                        });
+                    }
+                }
+
+                return Ok(rentals);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        // 特定ユーザーの貸出情報を取得
         [HttpGet("user/{employeeNo}")]
-        public async Task<IActionResult> GetUserRentalInfo(string employeeNo)
+        public IActionResult GetUserRentalInfo(string employeeNo)
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                var query = @"
+            SELECT 
+                r.rental_id as rentalId,
+                r.asset_no as assetNo,
+                r.rental_date as rentalDate,
+                r.due_date as dueDate,
+                r.return_date as returnDate
+            FROM ""TRN_RENTAL"" r
+            WHERE r.employee_no = @EmployeeNo
+            AND r.available_flag = FALSE
+            AND r.return_date IS NULL
+            LIMIT 1";
+
+                using var cmd = new NpgsqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@EmployeeNo", employeeNo);
+
+                using var reader = cmd.ExecuteReader();
+                if (reader.Read())
                 {
-                    await connection.OpenAsync();
-
-                    var query = @"
-                        SELECT 
-                            r.rental_id,
-                            r.asset_no,
-                            r.rental_date,
-                            r.due_date,
-                            r.return_date
-                        FROM ""TRN_RENTAL"" r
-                        WHERE r.employee_no = @employeeNo 
-                        AND r.available_flag = false
-                        LIMIT 1";
-
-                    using (var cmd = new NpgsqlCommand(query, connection))
+                    var rental = new
                     {
-                        cmd.Parameters.AddWithValue("employeeNo", employeeNo);
+                        rentalId = Convert.ToInt32(reader["rentalId"]),
+                        assetNo = reader["assetNo"]?.ToString(),
+                        rentalDate = reader["rentalDate"] != DBNull.Value
+                            ? Convert.ToDateTime(reader["rentalDate"]).ToString("yyyy/MM/dd")
+                            : null,
+                        dueDate = reader["dueDate"] != DBNull.Value
+                            ? Convert.ToDateTime(reader["dueDate"]).ToString("yyyy/MM/dd")
+                            : null
+                    };
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
+                    return Ok(new { rental = rental });
+                }
+
+                return Ok(new { rental = (object)null });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        // 返却処理（IDベース）
+        [HttpPost("return/{rentalId}")]
+        public IActionResult ReturnDeviceById(int rentalId)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                using var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    // まず該当レコードの情報を取得
+                    var getInfoQuery = @"
+                SELECT asset_no, employee_no, rental_date, due_date
+                FROM ""TRN_RENTAL""
+                WHERE rental_id = @RentalId
+                AND available_flag = FALSE
+                AND return_date IS NULL";
+
+                    string assetNo = null;
+                    string employeeNo = null;
+                    DateTime? rentalDate = null;
+                    DateTime? dueDate = null;
+
+                    using (var cmd = new NpgsqlCommand(getInfoQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@RentalId", rentalId);
+                        using var reader = cmd.ExecuteReader();
+                        if (reader.Read())
                         {
-                            if (await reader.ReadAsync())
-                            {
-                                return Ok(new
-                                {
-                                    success = true,
-                                    rental = new
-                                    {
-                                        rentalId = reader.GetInt32(0),
-                                        assetNo = reader.GetString(1),
-                                        rentalDate = reader.GetDateTime(2).ToString("yyyy/MM/dd"),
-                                        dueDate = reader.GetDateTime(3).ToString("yyyy/MM/dd"),
-                                        returnDate = reader.IsDBNull(4) ? "" : reader.GetDateTime(4).ToString("yyyy/MM/dd")
-                                    }
-                                });
-                            }
-
-                            return Ok(new { success = true, rental = (object?)null });
+                            assetNo = reader["asset_no"]?.ToString();
+                            employeeNo = reader["employee_no"]?.ToString();
+                            rentalDate = reader["rental_date"] as DateTime?;
+                            dueDate = reader["due_date"] as DateTime?;
+                        }
+                        else
+                        {
+                            return BadRequest(new { success = false, message = "貸出情報が見つかりません" });
                         }
                     }
+
+                    // 返却処理
+                    var updateQuery = @"
+                UPDATE ""TRN_RENTAL""
+                SET available_flag = TRUE,
+                    return_date = CURRENT_DATE
+                WHERE rental_id = @RentalId";
+
+                    using (var cmd = new NpgsqlCommand(updateQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@RentalId", rentalId);
+                        var result = cmd.ExecuteNonQuery();
+
+                        if (result == 0)
+                        {
+                            transaction.Rollback();
+                            return BadRequest(new { success = false, message = "返却処理に失敗しました" });
+                        }
+                    }
+
+                    // HST_RENTAL_CHANGEに記録
+                    var changeHistoryQuery = @"
+                INSERT INTO ""HST_RENTAL_CHANGE"" 
+                (change_date, change_type, asset_no, employee_no_before, employee_no_after, 
+                 rental_date_before, rental_date_after, due_date_before, due_date_after,
+                 return_date_after, changed_by_employee_no)
+                VALUES 
+                (CURRENT_TIMESTAMP, '返却', @AssetNo, @EmployeeNo, @EmployeeNo,
+                 @RentalDate, @RentalDate, @DueDate, @DueDate,
+                 CURRENT_DATE, @EmployeeNo)";
+
+                    using (var cmd = new NpgsqlCommand(changeHistoryQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@AssetNo", assetNo);
+                        cmd.Parameters.AddWithValue("@EmployeeNo", (object)employeeNo ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@RentalDate", (object)rentalDate ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@DueDate", (object)dueDate ?? DBNull.Value);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                    return Ok(new { success = true, message = "返却処理が完了しました" });
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
                 }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = $"エラー: {ex.Message}" });
-            }
-        }
-
-        // 貸出履歴を取得
-        [HttpGet("history")]
-        public async Task<IActionResult> GetRentalHistory([FromQuery] string searchQuery = null)
-        {
-            try
-            {
-                var query = from h in _context.HstRentalChanges
-                            join u in _context.MstUsers on h.EmployeeNo equals u.EmployeeNo into userJoin
-                            from u in userJoin.DefaultIfEmpty()
-                            select new RentalHistoryDto
-                            {
-                                Id = h.Id,
-                                RentalDate = h.RentalDate,
-                                ReturnDate = h.ReturnDate,
-                                EmployeeNo = h.EmployeeNo,
-                                EmployeeName = u != null ? u.Name : "不明",
-                                EmployeeNameKana = u != null ? u.NameKana : "",
-                                AssetNo = h.AssetNo,
-                                Os = h.Os
-                            };
-
-                // 検索フィルタ
-                if (!string.IsNullOrEmpty(searchQuery))
-                {
-                    var search = searchQuery.ToLower();
-                    query = query.Where(h =>
-                        h.AssetNo.ToLower().Contains(search) ||
-                        (h.Os != null && h.Os.ToLower().Contains(search)) ||
-                        h.EmployeeName.ToLower().Contains(search) ||
-                        h.EmployeeNameKana.ToLower().Contains(search) ||
-                        h.EmployeeNo.ToLower().Contains(search));
-                }
-
-                var histories = await query
-                    .OrderByDescending(h => h.RentalDate)
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = histories });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
     }
 
-    // リクエストモデル
+    // リクエストクラスの定義
     public class RentalRequest
     {
         public string AssetNo { get; set; }
         public string EmployeeNo { get; set; }
-        public string RentalDate { get; set; }
-        public string DueDate { get; set; }
-        public string? Remarks { get; set; }
+        public DateTime? RentalDate { get; set; }
+        public DateTime DueDate { get; set; }
+    }
+
+    public class ReturnRequest
+    {
+        public string AssetNo { get; set; }
+        public string EmployeeNo { get; set; }  // 現在のユーザーの社員番号
+        public DateTime? ReturnDate { get; set; }
     }
 }

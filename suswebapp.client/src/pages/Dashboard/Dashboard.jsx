@@ -1,23 +1,33 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿// Dashboard.jsx の修正版
+
+import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
 const Dashboard = ({ user }) => {
     const [rentalInfo, setRentalInfo] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // userがない場合のデフォルト値
+    const employeeNo = user?.employeeNo || localStorage.getItem('employeeNo') || 'A1002';
+
     useEffect(() => {
         fetchRentalInfo();
-    }, [user]);
+    }, []);
 
     const fetchRentalInfo = async () => {
         try {
-            const response = await fetch(`/api/rental/user/${user.employeeNo}`);
+            setLoading(true);
+            const response = await fetch(`/api/rental/user/${employeeNo}`);
             const data = await response.json();
+
             if (response.ok && data.rental) {
                 setRentalInfo(data.rental);
+            } else {
+                setRentalInfo(null);
             }
         } catch (error) {
             console.error('貸出情報の取得エラー:', error);
+            setRentalInfo(null);
         } finally {
             setLoading(false);
         }
@@ -25,16 +35,30 @@ const Dashboard = ({ user }) => {
 
     const handleReturn = async () => {
         if (!rentalInfo) return;
+
+        if (!window.confirm('返却してよろしいですか？')) {
+            return;
+        }
+
         try {
             const response = await fetch(`/api/rental/return/${rentalInfo.rentalId}`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
+
             if (response.ok) {
                 alert('返却処理が完了しました');
                 setRentalInfo(null);
+                // 再度情報を取得
+                fetchRentalInfo();
+            } else {
+                alert('返却処理に失敗しました');
             }
         } catch (error) {
             console.error('返却エラー:', error);
+            alert('返却処理中にエラーが発生しました');
         }
     };
 
