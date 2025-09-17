@@ -1,10 +1,9 @@
 ﻿.rental-status-container {
+    padding: 30px;
     height: 100vh;
+    background-color: #f5f5f5;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    background-color: #f8f9fa;
-    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -14,259 +13,369 @@
     align-items: center;
     margin-bottom: 20px;
     flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: 10px;
 }
 
     .rental-status-header h2 {
-        margin: 0;
+        font-size: 28px;
         color: #333;
-        font-size: clamp(1.2rem, 3vw, 1.8rem);
-    }
-
-.header-controls {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.toggle-btn, .back-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: clamp(0.85rem, 1.5vw, 0.95rem);
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.toggle-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-    .toggle-btn:hover {
-        background-color: #0056b3;
     }
 
 .back-btn {
-    background-color: #6c757d;
+    padding: 10px 20px;
+    background-color: #95a5a6;
     color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
     .back-btn:hover {
-        background-color: #5a6268;
+        background-color: #7f8c8d;
+    }
+
+/* コントロール部分 */
+.controls-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.search-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.search-history-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.clear-search-btn,
+.search-btn,
+.history-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+    .clear-search-btn:hover,
+    .search-btn:hover,
+    .history-btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.05);
+    }
+
+.search-input {
+    width: 300px;
+    padding: 6px 12px;
+    height: 30px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3498db;
     }
 
 /* テーブルコンテナ */
 .rental-table-container {
     flex: 1;
-    overflow: auto;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
+    margin-top: 20px;
 }
 
-/* テーブルラッパー（横スクロール用） */
 .rental-table-wrapper {
-    overflow-x: auto;
     flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
 }
 
-/* 基本のテーブル設定（モバイル用） */
+    .rental-table-wrapper.detail-view {
+        overflow-x: auto;
+    }
+
+        .rental-table-wrapper.detail-view .rental-table {
+            min-width: 1400px;
+        }
+
 .rental-table {
     width: 100%;
-    min-width: 550px;
     border-collapse: collapse;
-    font-size: 0.75rem;
 }
 
     .rental-table thead {
         position: sticky;
         top: 0;
-        background-color: #f8f9fa;
         z-index: 10;
     }
 
     .rental-table th {
-        padding: 6px 4px;
+        background-color: #34495e;
+        color: white;
+        padding: 12px;
         text-align: left;
-        font-weight: 600;
-        color: #495057;
-        border-bottom: 2px solid #dee2e6;
-        background-color: #f8f9fa;
-        white-space: nowrap;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
     }
 
     .rental-table td {
-        padding: 6px 4px;
-        border-bottom: 1px solid #dee2e6;
-        color: #333;
+        padding: 12px;
+        border-bottom: 1px solid #ecf0f1;
+        color: #2c3e50;
     }
 
-    .rental-table tbody tr:hover {
-        background-color: #f5f5f5;
+    .rental-table tr:hover {
+        background-color: #f8f9fa;
     }
 
-.asset-no.clickable {
-    color: #007bff !important;
+/* 資産番号リンク */
+.asset-link {
+    color: #3498db;
     cursor: pointer;
     text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s ease;
 }
 
-    .asset-no.clickable:hover {
-        color: #0056b3 !important;
+    .asset-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
     }
 
 /* ステータス表示 */
 .status-available {
-    display: inline-block;
-    padding: 2px 6px;
-    background-color: #28a745;
-    color: white;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    white-space: nowrap;
+    color: #27ae60;
+    font-weight: bold;
 }
 
-.status-rental {
-    display: inline-block;
-    padding: 2px 6px;
-    background-color: #ffc107;
-    color: #333;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    white-space: nowrap;
+.status-rented {
+    color: #e74c3c;
+    font-weight: bold;
 }
 
+/* 期限切れ行 */
+.overdue-row {
+    background-color: #ffe5e5;
+}
+
+    .overdue-row:hover {
+        background-color: #ffcccc;
+    }
+
+.text-danger {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* 故障機器行 */
+.broken-row {
+    background-color: #f0f0f0;
+    opacity: 0.7;
+}
+
+/* テーブルフッター */
 .table-footer {
-    padding: 15px;
+    padding: 15px 20px;
     background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    text-align: right;
+    border-top: 2px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
     flex-shrink: 0;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .record-count {
+    font-size: 14px;
     color: #6c757d;
-    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    font-weight: 500;
+}
+
+/* 詳細ボタンコンテナ */
+.detail-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+}
+
+.detail-toggle-btn {
+    width: 40px;
+    height: 30px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 15px;
+}
+
+    .detail-toggle-btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.1);
+    }
+
+.highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
 }
 
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    color: #6c757d;
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #7f8c8d;
 }
 
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 12px;
+/* スクロールバー */
+.rental-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.rental-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
     border-radius: 4px;
-    margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
 }
 
-/* 小さい画面から大きい画面の順で定義 */
+.rental-table-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
 
-/* タブレット以上 */
-@media (min-width: 768px) {
+    .rental-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .rental-status-container {
+        padding: 15px;
+    }
+
+    .rental-status-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .controls-container {
+        justify-content: center;
+        padding: 0 10px;
+    }
+
+    .search-input {
+        width: 200px;
+    }
+
+    .rental-table-wrapper {
+        overflow-x: auto;
+    }
+
     .rental-table {
-        min-width: 700px;
-        font-size: 0.8rem;
-    }
-
-        .rental-table th,
-        .rental-table td {
-            padding: 8px 6px;
-        }
-
-    .status-available,
-    .status-rental {
-        padding: 4px 8px;
-        font-size: 0.75rem;
+        min-width: 800px;
     }
 }
 
-/* デスクトップ */
-@media (min-width: 992px) {
-    .rental-table {
-        min-width: 700px;
-        font-size: 0.85rem;
-    }
-
-        .rental-table th,
-        .rental-table td {
-            padding: 10px 8px;
-        }
-
-    .status-available,
-    .status-rental {
-        font-size: 0.8rem;
-    }
-}
-
-/* 大画面 */
-@media (min-width: 1200px) {
-    .rental-table {
-        min-width: 1000px;
-        font-size: 0.9rem;
-    }
-
-        .rental-table th,
-        .rental-table td {
-            padding: 12px 10px;
-        }
-
-    .status-available,
-    .status-rental {
-        font-size: 0.85rem;
-    }
-}
-
-/* より大きな画面 */
-@media (min-width: 1400px) {
-    .rental-table {
-        min-width: 1200px;
-    }
-
-        .rental-table th,
-        .rental-table td {
-            padding: 12px 20px;
-        }
-}
-
-/* 超大画面 */
-@media (min-width: 1600px) {
-    .rental-table {
-        min-width: calc(100% - 40px);
-    }
-}
-
-/* フルHD以上 */
-@media (min-width: 1600px) {
-    .rental-table {
-        width: 100%;
-    }
-
-        .rental-table th,
-        .rental-table td {
-            padding: 14px 40px;
-        }
-}
-
-/* 高さの調整 */
-@media (max-height: 700px) {
+@media (max-width: 480px) {
     .rental-status-container {
         padding: 10px;
     }
 
-    .rental-status-header {
-        margin-bottom: 10px;
+    .rental-status-header h2 {
+        font-size: 24px;
+    }
+
+    .search-group {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* ヘッダーボタングループ */
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.filter-button-group {
+    display: flex;
+    gap: 5px;
+    background-color: white;
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+    .filter-button:hover {
+        background-color: #f0f0f0;
+    }
+
+    .filter-button.active {
+        background-color: #3498db;
+        color: white;
+    }
+
+/* レスポンシブ対応の修正 */
+@media (max-width: 768px) {
+    .header-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .filter-button-group {
+        width: 100%;
+        justify-content: center;
     }
 }

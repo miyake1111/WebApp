@@ -288,7 +288,80 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "デバイスが見つかりません" });
                 }
 
-                // 更新
+                // 更新者の社員番号を取得
+                var updaterEmployeeNo = Request.Headers["X-User-EmployeeNo"].FirstOrDefault() ?? "SYSTEM";
+
+                // 変更前の値を保存
+                var histories = new List<DeviceHistory>();
+
+                // 各項目の変更をチェック
+                if (device.Manufacturer != dto.Manufacturer)
+                {
+                    histories.Add(new DeviceHistory
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        UpdaterEmployeeNo = updaterEmployeeNo,
+                        TargetAssetNo = assetNo,
+                        ChangeField = "メーカー",
+                        ChangeContent = $"{device.Manufacturer} → {dto.Manufacturer}"
+                    });
+                }
+
+                if (device.Memory != dto.Memory)
+                {
+                    histories.Add(new DeviceHistory
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        UpdaterEmployeeNo = updaterEmployeeNo,
+                        TargetAssetNo = assetNo,
+                        ChangeField = "メモリ",
+                        ChangeContent = $"{device.Memory}GB → {dto.Memory}GB"
+                    });
+                }
+
+                if (device.Storage != dto.Storage)
+                {
+                    histories.Add(new DeviceHistory
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        UpdaterEmployeeNo = updaterEmployeeNo,
+                        TargetAssetNo = assetNo,
+                        ChangeField = "容量",
+                        ChangeContent = $"{device.Storage}GB → {dto.Storage}GB"
+                    });
+                }
+
+                if (device.StorageLocation != dto.StorageLocation)
+                {
+                    histories.Add(new DeviceHistory
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        UpdaterEmployeeNo = updaterEmployeeNo,
+                        TargetAssetNo = assetNo,
+                        ChangeField = "保管場所",
+                        ChangeContent = $"{device.StorageLocation} → {dto.StorageLocation}"
+                    });
+                }
+
+                if (device.IsBroken != dto.IsBroken)
+                {
+                    histories.Add(new DeviceHistory
+                    {
+                        ChangeDate = DateTime.UtcNow,
+                        UpdaterEmployeeNo = updaterEmployeeNo,
+                        TargetAssetNo = assetNo,
+                        ChangeField = "故障",
+                        ChangeContent = $"{(device.IsBroken ? "あり" : "なし")} → {(dto.IsBroken ? "あり" : "なし")}"
+                    });
+                }
+
+                // 履歴をDBに追加
+                if (histories.Any())
+                {
+                    _context.DeviceHistories.AddRange(histories);
+                }
+
+                // デバイス情報を更新
                 device.Manufacturer = dto.Manufacturer ?? device.Manufacturer;
                 device.Os = dto.Os ?? device.Os;
                 device.Memory = dto.Memory;
@@ -296,10 +369,10 @@ namespace SUSWebApp.Server.Controllers
                 device.GraphicsCard = dto.GraphicsCard ?? device.GraphicsCard;
                 device.StorageLocation = dto.StorageLocation ?? device.StorageLocation;
                 device.IsBroken = dto.IsBroken;
-                device.LeaseStartDate = dto.LeaseStartDate?.ToUniversalTime(); // UTCに変換
-                device.LeaseEndDate = dto.LeaseEndDate?.ToUniversalTime();     // UTCに変換
+                device.LeaseStartDate = dto.LeaseStartDate?.ToUniversalTime();
+                device.LeaseEndDate = dto.LeaseEndDate?.ToUniversalTime();
                 device.Remarks = dto.Remarks;
-                device.UpdateDate = DateTime.UtcNow;  // UtcNowを使用
+                device.UpdateDate = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 
@@ -311,6 +384,53 @@ namespace SUSWebApp.Server.Controllers
                 {
                     success = false,
                     message = "更新エラー",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetDeviceHistory()
+        {
+            try
+            {
+                var histories = await _context.DeviceHistories
+                    .OrderByDescending(h => h.ChangeDate)
+                    .Select(h => new
+                    {
+                        id = h.Id,
+                        changeDate = h.ChangeDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm"),
+                        updaterEmployeeNo = h.UpdaterEmployeeNo,
+                        updaterName = _context.MstUsers
+                            .Where(u => u.EmployeeNo == h.UpdaterEmployeeNo)
+                            .Select(u => u.Name)
+                            .FirstOrDefault() ?? "不明",
+                        targetAssetNo = h.TargetAssetNo,
+                        targetManufacturer = _context.MstDevices
+                            .Where(d => d.AssetNo == h.TargetAssetNo)
+                            .Select(d => d.Manufacturer)
+                            .FirstOrDefault() ?? "",
+                        targetOs = _context.MstDevices
+                            .Where(d => d.AssetNo == h.TargetAssetNo)
+                            .Select(d => d.Os)
+                            .FirstOrDefault() ?? "",
+                        changeField = h.ChangeField,
+                        changeContent = h.ChangeContent
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    data = histories
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "履歴取得エラー",
                     error = ex.Message
                 });
             }

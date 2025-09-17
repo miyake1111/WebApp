@@ -1,4 +1,4 @@
-.modal-overlay {
+﻿.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -110,4 +110,50 @@
 
     .cancel-btn:hover {
         background-color: #c0392b;
+    }
+
+/* 既存のコードの最後に以下を追加 */
+
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.checking-text {
+    color: #007bff;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-group input.error {
+    border-color: #dc3545;
+}
+
+.form-group input:invalid {
+    border-color: #dc3545;
+}
+
+/* 必須項目のラベル */
+.form-group label:has(+ input:required)::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* 警告メッセージ（リース期限日用） */
+.error-text:has-text("⚠️") {
+    color: #ffc107;
+}
+
+/* 保存ボタンの無効化状態 */
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #95a5a6;
+}
+
+    .save-btn:disabled:hover {
+        background-color: #95a5a6;
     }

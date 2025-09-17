@@ -17,6 +17,8 @@ namespace SUSWebApp.Server.Data
         public DbSet<TrnRental> TrnRentals { get; set; }
         public DbSet<HstDeviceChange> HstDeviceChanges { get; set; }
         public DbSet<HstUserChange> HstUserChanges { get; set; }
+        public DbSet<DeviceHistory> DeviceHistories { get; set; }
+        public DbSet<RentalHistory> HstRentalChanges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +29,19 @@ namespace SUSWebApp.Server.Data
             modelBuilder.Entity<TrnRental>().ToTable("TRN_RENTAL");
             modelBuilder.Entity<HstDeviceChange>().ToTable("HST_DEVICE_CHANGE");
             modelBuilder.Entity<HstUserChange>().ToTable("HST_USER_CHANGE");
+            modelBuilder.Entity<RentalHistory>().ToTable("HST_RENTAL_CHANGE");
+
+            // RentalHistory のカラムマッピング追加
+            modelBuilder.Entity<RentalHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.RentalDate).HasColumnName("rental_date");
+                entity.Property(e => e.ReturnDate).HasColumnName("return_date");
+                entity.Property(e => e.EmployeeNo).HasColumnName("employee_no").HasMaxLength(20);
+                entity.Property(e => e.AssetNo).HasColumnName("asset_no").HasMaxLength(20);
+                entity.Property(e => e.Os).HasColumnName("os").HasMaxLength(50);
+            });
 
             // 外部キー制約などの設定
             modelBuilder.Entity<TrnRental>()

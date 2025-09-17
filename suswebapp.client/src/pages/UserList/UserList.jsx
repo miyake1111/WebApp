@@ -33,7 +33,6 @@ const UserList = ({ onBack }) => {
                 ).length;
                 return matchCount > 0;
             }).sort((a, b) => {
-                // 含まれている回数でソート
                 const aCount = Object.values(a).filter(value =>
                     value && value.toString().toLowerCase().includes(query)
                 ).length;
@@ -81,7 +80,6 @@ const UserList = ({ onBack }) => {
         setDetailView(!detailView);
     };
 
-    // その他の関数は変更なし...
     const handleAdd = () => {
         setSelectedUser(null);
         setShowAddModal(true);
@@ -140,7 +138,6 @@ const UserList = ({ onBack }) => {
         try {
             const currentUserEmployeeNo = localStorage.getItem('employeeNo') || 'A1002';
 
-            // データ整形
             const requestData = {
                 employeeNo: formData.employeeNo,
                 name: formData.name || null,
@@ -307,65 +304,65 @@ const UserList = ({ onBack }) => {
                                         )}
                                     </tr>
                                 </thead>
-                                    <tbody>
-                                        {filteredUsers.map((user) => (
-                                            <tr key={user.employeeNo}
-                                                className={user.retirementDate ? 'retired-row' : ''}
-                                            >
-                                                <td>
-                                                    <div className="employee-no-cell">
-                                                        {editMode && (
-                                                            <button
-                                                                className="inline-edit-btn"
-                                                                onClick={() => handleEdit(user)}
-                                                                title="編集"
-                                                            >
-                                                                ✎
-                                                            </button>
-                                                        )}
-                                                        {deleteMode && (
-                                                            <button
-                                                                className="inline-delete-btn"
-                                                                onClick={() => handleDeleteClick(user)}
-                                                                title="削除"
-                                                            >
-                                                                −
-                                                            </button>
-                                                        )}
-                                                        <span>{highlightText(user.employeeNo, searchQuery)}</span>
-                                                    </div>
-                                                </td>
-                                                <td>{highlightText(user.name, searchQuery)}</td>
-                                                <td>{highlightText(user.nameKana, searchQuery)}</td>
-                                                {!detailView ? (
-                                                    <>
-                                                        <td>{highlightText(user.phone, searchQuery)}</td>
-                                                        <td>{highlightText(user.email, searchQuery)}</td>
-                                                        <td>{highlightText(user.position || '-', searchQuery)}</td>
-                                                        <td>{highlightText(user.pcAuthority, searchQuery)}</td>
-                                                        <td>{user.updateDate ? new Date(user.updateDate).toLocaleDateString('ja-JP') : '-'}</td>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <td>{highlightText(user.department, searchQuery)}</td>
-                                                        <td>{highlightText(user.phone, searchQuery)}</td>
-                                                        <td>{highlightText(user.email, searchQuery)}</td>
-                                                        <td>{highlightText(user.age, searchQuery)}</td>
-                                                        <td>{highlightText(user.gender, searchQuery)}</td>
-                                                        <td>{highlightText(user.position || '-', searchQuery)}</td>
-                                                        <td>{highlightText(user.pcAuthority, searchQuery)}</td>
-                                                        <td>{user.registrationDate ? new Date(user.registrationDate).toLocaleDateString('ja-JP') : '-'}</td>
-                                                        <td>{user.updateDate ? new Date(user.updateDate).toLocaleDateString('ja-JP') : '-'}</td>
-                                                        <td>{user.retirementDate ? new Date(user.retirementDate).toLocaleDateString('ja-JP') : '-'}</td>
-                                                    </>
-                                                )}
-                                            </tr>
-                                        ))}
-                                    </tbody>
+                                <tbody>
+                                    {filteredUsers.map((user) => (
+                                        <tr key={user.employeeNo}
+                                            className={user.retirementDate ? 'retired-row' : ''}
+                                        >
+                                            <td>
+                                                <div className="employee-no-cell">
+                                                    {editMode && (
+                                                        <button
+                                                            className="inline-edit-btn"
+                                                            onClick={() => handleEdit(user)}
+                                                            title="編集"
+                                                        >
+                                                            ✎
+                                                        </button>
+                                                    )}
+                                                    {deleteMode && (
+                                                        <button
+                                                            className="inline-delete-btn"
+                                                            onClick={() => handleDeleteClick(user)}
+                                                            title="削除"
+                                                        >
+                                                            −
+                                                        </button>
+                                                    )}
+                                                    <span>{highlightText(user.employeeNo, searchQuery)}</span>
+                                                </div>
+                                            </td>
+                                            <td>{highlightText(user.name || '-', searchQuery)}</td>
+                                            <td>{highlightText(user.nameKana || '-', searchQuery)}</td>
+                                            {!detailView ? (
+                                                <>
+                                                    <td>{highlightText(user.phone || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.email || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.position || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.pcAuthority || '-', searchQuery)}</td>
+                                                    <td>{user.updateDate ? new Date(user.updateDate).toLocaleDateString('ja-JP') : '-'}</td>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <td>{highlightText(user.department || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.phone || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.email || '-', searchQuery)}</td>
+                                                    <td>{user.age || '-'}</td>
+                                                    <td>{user.gender === 'male' ? '男' : user.gender === 'female' ? '女' : '-'}</td>
+                                                    <td>{highlightText(user.position || '-', searchQuery)}</td>
+                                                    <td>{highlightText(user.pcAuthority || '-', searchQuery)}</td>
+                                                    <td>{user.registrationDate ? new Date(user.registrationDate).toLocaleDateString('ja-JP') : '-'}</td>
+                                                    <td>{user.updateDate ? new Date(user.updateDate).toLocaleDateString('ja-JP') : '-'}</td>
+                                                    <td>{user.retirementDate ? new Date(user.retirementDate).toLocaleDateString('ja-JP') : '-'}</td>
+                                                </>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
                         </div>
 
-                        {/* 表示件数のみテーブル内に固定 */}
+                        {/* 表示件数 */}
                         <div className="table-footer">
                             <span className="record-count">
                                 表示中：{filteredUsers.length}件
@@ -406,8 +403,7 @@ const UserList = ({ onBack }) => {
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={handleDeleteConfirm}
-                deviceName={deleteTarget?.name || deleteTarget?.employeeNo}  // 名前を表示
-                deleteTarget={deleteTarget}  // オブジェクト全体を渡す
+                userName={deleteTarget?.name}
             />
 
             <UserHistoryModal

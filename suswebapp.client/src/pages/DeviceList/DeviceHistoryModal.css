@@ -1,0 +1,188 @@
+﻿.history-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .history-header h2 {
+        color: #333;
+        font-size: 24px;
+    }
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+    .filter-btn:hover {
+        background-color: #f8f9fa;
+    }
+
+    .filter-btn.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+/* テーブルコンテナ */
+.history-table-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 0;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.history-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+    /* スクロールバーのスタイル */
+    .history-table-wrapper::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+
+    .history-table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .history-table-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+        .history-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+    .history-table th {
+        background-color: #34495e;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .history-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ecf0f1;
+        color: #333;
+    }
+
+    .history-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+/* 表示件数フッター */
+.history-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.record-count {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.no-data {
+    text-align: center;
+    color: #999;
+    padding: 30px !important;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.employee-info-cell {
+    line-height: 1.4;
+    padding: 8px !important;
+}
+
+    .employee-info-cell div {
+        margin: 2px 0;
+    }
+
+.device-info-cell {
+    line-height: 1.4;
+    padding: 8px !important;
+}
+
+    .device-info-cell div {
+        margin: 2px 0;
+    }
+
+    .device-info-cell .sub-info {
+        font-size: 0.85em;
+        color: #666;
+    }
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+.cancel-btn {
+    padding: 10px 30px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .cancel-btn:hover {
+        background-color: #c0392b;
+    }

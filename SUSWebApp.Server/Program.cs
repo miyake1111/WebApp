@@ -4,8 +4,13 @@ using SUSWebApp.Server.Data;
 using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using SUSWebApp.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// builder.Services ‚Ì•”•ª‚É’Ç‰Á
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddControllers()

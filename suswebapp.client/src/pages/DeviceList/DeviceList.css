@@ -12,28 +12,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    flex-shrink: 0; /* ヘッダーは縮まないように */
+    flex-shrink: 0;
 }
 
     .device-list-header h2 {
         font-size: 28px;
         color: #333;
     }
-
-.header-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.add-btn {
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-}
 
 .back-btn {
     padding: 10px 20px;
@@ -45,130 +30,52 @@
     cursor: pointer;
 }
 
-/* テーブルラッパーを修正 */
-.device-table-wrapper {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 1; /* 残りの高さを占める */
-    overflow: auto; /* スクロール可能にする */
-    min-height: 0; /* flexアイテムのスクロールに必要 */
-}
-
-.device-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-    /* ヘッダーを固定する場合のスタイル */
-    .device-table thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
+    .back-btn:hover {
+        background-color: #7f8c8d;
     }
 
-    .device-table th {
-        background-color: #34495e;
-        color: white;
-        padding: 12px;
-        text-align: left;
-        font-weight: 500;
-        position: sticky;
-        top: 0;
-    }
-
-    .device-table td {
-        padding: 12px;
-        border-bottom: 1px solid #ecf0f1;
-        color: #2c3e50;
-    }
-
-    .device-table tr:hover {
-        background-color: #f8f9fa;
-    }
-
-.status-broken {
-    color: #e74c3c;
-    font-weight: bold;
+/* コントロール全体のコンテナ */
+.controls-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: px;
+    padding: 0 20px;
 }
 
-.edit-btn, .delete-btn {
-    padding: 6px 12px;
-    margin: 0 5px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+/* 左側グループ（モードボタン） */
+.mode-buttons-group {
+    display: flex;
+    gap: 10px;
 }
 
-.edit-btn {
-    background-color: #f39c12;
-    color: white;
+/* 右側グループ（検索関連） */
+.search-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
 }
 
-    .edit-btn:hover {
-        background-color: #e67e22;
-    }
-
-.delete-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-    .delete-btn:hover {
-        background-color: #c0392b;
-    }
-
-.loading {
-    text-align: center;
-    padding: 50px;
-    font-size: 18px;
-    color: #7f8c8d;
-}
-
-.add-btn:hover {
-    background-color: #2980b9;
-}
-
-.back-btn:hover {
-    background-color: #7f8c8d;
-}
-
-/* レスポンシブ対応 */
-@media (max-height: 600px) {
-    .device-list-container {
-        padding: 15px;
-    }
-
-    .device-list-header {
-        margin-bottom: 10px;
-    }
-
-    .device-table-wrapper {
-        padding: 10px;
-    }
+/* 検索と履歴ボタンを縦に配置 */
+.search-history-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 /* モードボタン */
-.mode-buttons {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding-left: 20px;
-}
-
 .mode-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border: 2px solid #ddd;
     background-color: white;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     transition: all 0.3s ease;
 }
 
@@ -207,6 +114,47 @@
         color: white;
     }
 
+/* 検索関連ボタン */
+.clear-search-btn,
+.search-btn,
+.history-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    color: #000000;
+}
+
+    .clear-search-btn:hover,
+    .search-btn:hover,
+    .history-btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.05);
+    }
+
+/* 検索入力 */
+.search-input {
+    width: 300px;
+    padding: 6px 12px;
+    height: 30px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
 /* アイコンスタイル */
 .icon-plus {
     font-weight: bold;
@@ -219,6 +167,71 @@
 .icon-pen {
     font-size: 18px;
 }
+
+/* テーブルコンテナ全体 */
+.device-table-container {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+/* テーブルラッパー */
+.device-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+    /* 詳細ビュー時 */
+    .device-table-wrapper.detail-view {
+        overflow-x: auto;
+    }
+
+        .device-table-wrapper.detail-view .device-table {
+            min-width: 1400px;
+        }
+
+/* テーブル */
+.device-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .device-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .device-table th {
+        background-color: #34495e;
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+    }
+
+    .device-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .device-table tr:hover {
+        background-color: #f8f9fa;
+    }
 
 /* 資産番号セル */
 .asset-no-cell {
@@ -263,3 +276,133 @@
         background-color: #e74c3c;
         color: white;
     }
+
+/* テーブルフッター */
+.table-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.record-count {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* 詳細ボタンコンテナ（テーブル外） */
+.detail-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+}
+
+.detail-toggle-btn {
+    width: 40px;
+    height: 30px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 15px;
+}
+
+    .detail-toggle-btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.1);
+    }
+
+/* 検索ハイライト */
+.highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+/* 故障ステータス */
+.status-broken {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* リース期限切れの行のスタイル */
+.device-table tbody tr.lease-expired {
+    background-color: #a9a9a9;
+    color: #666;
+    opacity: 0.8;
+}
+
+    .device-table tbody tr.lease-expired:hover {
+        background-color: #eeeeee;
+    }
+
+    .device-table tbody tr.lease-expired .inline-edit-btn,
+    .device-table tbody tr.lease-expired .inline-delete-btn {
+        opacity: 1;
+    }
+
+/* 故障機器の行のスタイル */
+.device-table tbody tr.broken-device {
+    background-color: #ffcccc;
+}
+
+    .device-table tbody tr.broken-device:hover {
+        background-color: #ffdddd;
+    }
+
+/* スクロールバーのスタイル */
+.device-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.device-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.device-table-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    .device-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+/* レスポンシブ対応 */
+@media (max-height: 600px) {
+    .device-list-container {
+        padding: 15px;
+    }
+
+    .device-list-header {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .device-table-wrapper {
+        max-width: calc(100vw - 40px);
+    }
+}

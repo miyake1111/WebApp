@@ -1,4 +1,5 @@
-﻿import React, { useState } from 'react';
+﻿/*
+import React, { useState } from 'react';
 import './DeviceDetailModal.css';
 
 const DeviceDetailModal = ({ device, onClose, onAction, currentUser }) => {
@@ -117,3 +118,4 @@ const DeviceDetailModal = ({ device, onClose, onAction, currentUser }) => {
 };
 
 export default DeviceDetailModal;
+*/

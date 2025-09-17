@@ -1,0 +1,13 @@
+/* ‘Y”Ô†ƒŠƒ“ƒN */
+.asset-link {
+    color: #3498db;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+    .asset-link:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }

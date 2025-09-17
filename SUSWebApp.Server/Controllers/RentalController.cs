@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Data;
+using SUSWebApp.Server.Data;
+using SUSWebApp.Server.Models.DTOs;
+using SUSWebApp.Server.Models.Entities;
 
 namespace SUSWebApp.Server.Controllers
 {
@@ -9,11 +13,13 @@ namespace SUSWebApp.Server.Controllers
     public class RentalController : ControllerBase
     {
         private readonly string _connectionString;
+        private readonly ApplicationDbContext _context;
 
-        public RentalController(IConfiguration configuration)
+        public RentalController(IConfiguration configuration, ApplicationDbContext context)  // contextパラメータ追加
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection") ??
                                "Host=localhost;Database=postgres;Username=postgres;Password=ms369369";
+            _context = context;  // 正しく代入
         }
 
         // 貸出状況一覧を取得（全機器：空き・貸出中両方）
@@ -277,6 +283,51 @@ namespace SUSWebApp.Server.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = $"エラー: {ex.Message}" });
+            }
+        }
+
+        // 貸出履歴を取得
+        [HttpGet("history")]
+        public async Task<IActionResult> GetRentalHistory([FromQuery] string searchQuery = null)
+        {
+            try
+            {
+                var query = from h in _context.HstRentalChanges
+                            join u in _context.MstUsers on h.EmployeeNo equals u.EmployeeNo into userJoin
+                            from u in userJoin.DefaultIfEmpty()
+                            select new RentalHistoryDto
+                            {
+                                Id = h.Id,
+                                RentalDate = h.RentalDate,
+                                ReturnDate = h.ReturnDate,
+                                EmployeeNo = h.EmployeeNo,
+                                EmployeeName = u != null ? u.Name : "不明",
+                                EmployeeNameKana = u != null ? u.NameKana : "",
+                                AssetNo = h.AssetNo,
+                                Os = h.Os
+                            };
+
+                // 検索フィルタ
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    var search = searchQuery.ToLower();
+                    query = query.Where(h =>
+                        h.AssetNo.ToLower().Contains(search) ||
+                        (h.Os != null && h.Os.ToLower().Contains(search)) ||
+                        h.EmployeeName.ToLower().Contains(search) ||
+                        h.EmployeeNameKana.ToLower().Contains(search) ||
+                        h.EmployeeNo.ToLower().Contains(search));
+                }
+
+                var histories = await query
+                    .OrderByDescending(h => h.RentalDate)
+                    .ToListAsync();
+
+                return Ok(new { success = true, data = histories });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
     }
