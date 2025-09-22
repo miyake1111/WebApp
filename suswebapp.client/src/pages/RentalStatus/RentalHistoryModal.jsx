@@ -178,12 +178,10 @@ const RentalHistoryModal = ({ isOpen, onClose, currentUser }) => {
                                     filteredHistories.map((history) => (
                                         <tr key={history.id}>
                                             <td>
-                                                {new Date(history.rentalDate).toLocaleDateString('ja-JP')}
+                                                {history.rentalDate || '-'}
                                             </td>
                                             <td>
-                                                {history.returnDate
-                                                    ? new Date(history.returnDate).toLocaleDateString('ja-JP')
-                                                    : '-'}
+                                                {history.returnDate || '未返却'}
                                             </td>
                                             <td>
                                                 <div className="employee-info">
@@ -215,7 +213,7 @@ const RentalHistoryModal = ({ isOpen, onClose, currentUser }) => {
 
                 <div className="modal-buttons">
                     <button className="cancel-btn" onClick={onClose}>
-                        キャンセル
+                        閉じる
                     </button>
                 </div>
             </div>

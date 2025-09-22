@@ -436,6 +436,109 @@ namespace SUSWebApp.Server.Controllers
                 return StatusCode(500, new { success = false, message = $"エラー: {ex.Message}" });
             }
         }
+
+        [HttpGet("history")]
+        public IActionResult GetAllRentalHistory()
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                var query = @"
+            SELECT 
+                r.rental_id as id,
+                r.asset_no as assetNo,
+                TO_CHAR(r.rental_date, 'YYYY-MM-DD') as rentalDate,
+                TO_CHAR(r.return_date, 'YYYY-MM-DD') as returnDate,
+                r.employee_no as employeeNo,
+                u.name as employeeName,
+                u.name_kana as employeeNameKana,
+                d.os
+            FROM ""TRN_RENTAL"" r
+            LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
+            LEFT JOIN ""MST_DEVICE"" d ON r.asset_no = d.asset_no
+            WHERE r.rental_date IS NOT NULL
+            ORDER BY r.rental_date DESC";
+
+                var histories = new List<object>();
+                using (var cmd = new NpgsqlCommand(query, connection))
+                {
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        histories.Add(new
+                        {
+                            id = reader["id"],
+                            assetNo = reader["assetNo"]?.ToString(),
+                            rentalDate = reader["rentalDate"]?.ToString(),
+                            returnDate = reader["returnDate"]?.ToString(),
+                            employeeNo = reader["employeeNo"]?.ToString(),
+                            employeeName = reader["employeeName"]?.ToString(),
+                            employeeNameKana = reader["employeeNameKana"]?.ToString(),
+                            os = reader["os"]?.ToString()
+                        });
+                    }
+                }
+
+                return Ok(new { success = true, data = histories });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+        // 特定資産の履歴取得
+        [HttpGet("history/{assetNo}")]
+        public IActionResult GetAssetRentalHistory(string assetNo)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                var query = @"
+            SELECT 
+                r.rental_id as rentalId,
+                TO_CHAR(r.rental_date, 'YYYY-MM-DD') as rentalDate,
+                TO_CHAR(r.return_date, 'YYYY-MM-DD') as returnDate,
+                r.employee_no as employeeNo,
+                u.name as employeeName,
+                d.os
+            FROM ""TRN_RENTAL"" r
+            LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
+            LEFT JOIN ""MST_DEVICE"" d ON r.asset_no = d.asset_no
+            WHERE r.asset_no = @AssetNo
+            AND r.rental_date IS NOT NULL
+            ORDER BY r.rental_date DESC";
+
+                var histories = new List<object>();
+                using (var cmd = new NpgsqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@AssetNo", assetNo);
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        histories.Add(new
+                        {
+                            rentalId = reader["rentalId"],
+                            rentalDate = reader["rentalDate"]?.ToString(),
+                            returnDate = reader["returnDate"]?.ToString(),
+                            employeeNo = reader["employeeNo"]?.ToString(),
+                            employeeName = reader["employeeName"]?.ToString(),
+                            os = reader["os"]?.ToString()
+                        });
+                    }
+                }
+
+                return Ok(histories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 
     // リクエストクラスの定義

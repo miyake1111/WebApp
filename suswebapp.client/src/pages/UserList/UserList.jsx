@@ -348,7 +348,7 @@ const UserList = ({ onBack }) => {
                                                     <td>{highlightText(user.phone || '-', searchQuery)}</td>
                                                     <td>{highlightText(user.email || '-', searchQuery)}</td>
                                                     <td>{user.age || '-'}</td>
-                                                    <td>{user.gender === 'male' ? '男' : user.gender === 'female' ? '女' : '-'}</td>
+                                                    <td>{user.gender || '-'}</td>
                                                     <td>{highlightText(user.position || '-', searchQuery)}</td>
                                                     <td>{highlightText(user.pcAuthority || '-', searchQuery)}</td>
                                                     <td>{user.registrationDate ? new Date(user.registrationDate).toLocaleDateString('ja-JP') : '-'}</td>

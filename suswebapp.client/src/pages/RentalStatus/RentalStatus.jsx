@@ -18,7 +18,12 @@ const RentalStatus = ({ onBack }) => {
     const [showReturnForm, setShowReturnForm] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState(null);
     const [detailView, setDetailView] = useState(false);
-    const currentUser = localStorage.getItem('employeeNo') || 'A1002';
+
+    // currentUserをオブジェクトとして定義（ここを変更）
+    const currentUser = {
+        employeeNo: localStorage.getItem('employeeNo') || 'A1002',
+        name: localStorage.getItem('userName') || ''
+    };
 
     useEffect(() => {
         fetchRentalStatus();
