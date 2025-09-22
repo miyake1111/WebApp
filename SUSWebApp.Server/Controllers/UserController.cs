@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using SUSWebApp.Server.Data;
-using SUSWebApp.Server.Models.Entities;
 using SUSWebApp.Server.Models.Dto;
+using SUSWebApp.Server.Models.Entities;
 
 namespace SUSWebApp.Server.Controllers
 {
@@ -353,6 +354,45 @@ namespace SUSWebApp.Server.Controllers
                     error = ex.Message
                 });
             }
+        }
+
+        [HttpPost("set-password")]
+        public async Task<IActionResult> SetPassword([FromBody] PasswordSetRequest request)
+        {
+            try
+            {
+                // Entity Frameworkの接続文字列を取得
+                var connectionString = _context.Database.GetConnectionString();
+
+                using var connection = new NpgsqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                // AUTH_USERテーブルに登録
+                var query = @"
+            INSERT INTO ""AUTH_USER"" (employee_no, password)
+            VALUES (@EmployeeNo, @Password)
+            ON CONFLICT (employee_no) 
+            DO UPDATE SET password = @Password";
+
+                using var cmd = new NpgsqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@EmployeeNo", request.EmployeeNo);
+                cmd.Parameters.AddWithValue("@Password", request.Password);
+
+                var result = await cmd.ExecuteNonQueryAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+        // リクエストクラスを追加（クラスの最後に）
+        public class PasswordSetRequest
+        {
+            public string EmployeeNo { get; set; }
+            public string Password { get; set; }
         }
     }
 }

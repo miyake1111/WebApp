@@ -3,6 +3,7 @@ import './UserList.css';
 import UserModal from './UserModal';
 import DeleteConfirmModal from '../DeviceList/DeleteConfirmModal';
 import UserHistoryModal from './UserHistoryModal';
+import PasswordSetModal from './PasswordSetModal';  // 追加
 
 const UserList = ({ onBack }) => {
     const [users, setUsers] = useState([]);
@@ -12,8 +13,10 @@ const UserList = ({ onBack }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);  // 追加
     const [selectedUser, setSelectedUser] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [newUserData, setNewUserData] = useState(null);  // 追加
     const [editMode, setEditMode] = useState(false);
     const [deleteMode, setDeleteMode] = useState(false);
     const [detailView, setDetailView] = useState(false);
@@ -168,6 +171,15 @@ const UserList = ({ onBack }) => {
             });
 
             if (response.ok) {
+                if (showAddModal) {
+                    // 新規登録の場合、パスワード設定モーダルを表示
+                    setNewUserData({
+                        employeeNo: formData.employeeNo,
+                        employeeName: formData.name
+                    });
+                    setShowPasswordModal(true);
+                }
+
                 alert(showEditModal ? '更新しました' : '登録しました');
                 fetchUsers();
                 setShowAddModal(false);
@@ -182,6 +194,12 @@ const UserList = ({ onBack }) => {
             console.error('保存エラー:', error);
             alert('保存に失敗しました');
         }
+    };
+
+    // パスワード設定完了時の処理
+    const handlePasswordSet = () => {
+        setShowPasswordModal(false);
+        setNewUserData(null);
     };
 
     // 検索文字のハイライト
@@ -409,6 +427,14 @@ const UserList = ({ onBack }) => {
             <UserHistoryModal
                 isOpen={showHistoryModal}
                 onClose={() => setShowHistoryModal(false)}
+            />
+
+            <PasswordSetModal
+                isOpen={showPasswordModal}
+                onClose={() => setShowPasswordModal(false)}
+                employeeNo={newUserData?.employeeNo}
+                employeeName={newUserData?.employeeName}
+                onPasswordSet={handlePasswordSet}
             />
         </div>
     );
