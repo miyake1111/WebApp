@@ -1,7 +1,10 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import './Layout.css';
+import PasswordUpdateModal from './PasswordUpdateModal';
 
 const Layout = ({ children, user, onLogout, onNavigate, currentPage }) => {
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+
     return (
         <div className="layout-container">
             <div className="main-container">
@@ -12,7 +15,6 @@ const Layout = ({ children, user, onLogout, onNavigate, currentPage }) => {
                             <p className="sidebar-user-name">{user?.name || user?.employeeName || 'USER名'}</p>
                         </div>
                     </div>
-
                     <nav className="nav-menu">
                         <button
                             onClick={() => onNavigate('dashboard')}
@@ -38,16 +40,29 @@ const Layout = ({ children, user, onLogout, onNavigate, currentPage }) => {
                         >
                             ユーザー一覧
                         </button>
+
+                        <button
+                            onClick={() => setShowPasswordModal(true)}
+                            className="password-update-btn"
+                        >
+                            パスワード変更
+                        </button>
+
                         <button onClick={onLogout} className="logout-btn">
                             ログアウト
                         </button>
                     </nav>
                 </aside>
-
                 <main className="main-content">
                     {children}
                 </main>
             </div>
+
+            <PasswordUpdateModal
+                isOpen={showPasswordModal}
+                onClose={() => setShowPasswordModal(false)}
+                employeeNo={user?.employeeNo || localStorage.getItem('employeeNo')}
+            />
         </div>
     );
 };

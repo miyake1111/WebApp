@@ -91,3 +91,16 @@
     justify-content: center; /* 追加 */
     align-items: center; /* 追加 */
 }
+
+/* パスワード変更ボタン */
+.nav-menu .password-update-btn {
+    background-color: #3498db;
+    color: white;
+    margin-top: 500px;
+    margin-bottom: 10px;
+}
+
+    .nav-menu .password-update-btn:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }

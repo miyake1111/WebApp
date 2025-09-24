@@ -388,6 +388,50 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
+        {
+            try
+            {
+                var connectionString = _context.Database.GetConnectionString();
+
+                using var connection = new NpgsqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                // パスワードを更新
+                var query = @"
+            UPDATE ""AUTH_USER"" 
+            SET password = @NewPassword
+            WHERE employee_no = @EmployeeNo";
+
+                using var cmd = new NpgsqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@EmployeeNo", request.EmployeeNo);
+                cmd.Parameters.AddWithValue("@NewPassword", request.NewPassword);
+
+                var result = await cmd.ExecuteNonQueryAsync();
+
+                if (result > 0)
+                {
+                    return Ok(new { success = true });
+                }
+                else
+                {
+                    return Ok(new { success = false, message = "更新対象が見つかりません" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+        public class UpdatePasswordRequest
+        {
+            public string EmployeeNo { get; set; }
+            public string CurrentPassword { get; set; }  // 使わないけど一応
+            public string NewPassword { get; set; }
+        }
+
         // リクエストクラスを追加（クラスの最後に）
         public class PasswordSetRequest
         {
