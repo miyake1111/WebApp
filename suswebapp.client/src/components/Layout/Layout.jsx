@@ -41,16 +41,18 @@ const Layout = ({ children, user, onLogout, onNavigate, currentPage }) => {
                             ユーザー一覧
                         </button>
 
-                        <button
-                            onClick={() => setShowPasswordModal(true)}
-                            className="password-update-btn"
-                        >
-                            パスワード変更
-                        </button>
-
-                        <button onClick={onLogout} className="logout-btn">
-                            ログアウト
-                        </button>
+                        {/* 下部ボタングループ */}
+                        <div className="bottom-buttons">
+                            <button
+                                onClick={() => setShowPasswordModal(true)}
+                                className="password-update-btn"
+                            >
+                                パスワード変更
+                            </button>
+                            <button onClick={onLogout} className="logout-btn">
+                                ログアウト
+                            </button>
+                        </div>
                     </nav>
                 </aside>
                 <main className="main-content">

@@ -19,7 +19,6 @@ const RentalStatus = ({ onBack }) => {
     const [selectedDevice, setSelectedDevice] = useState(null);
     const [detailView, setDetailView] = useState(false);
 
-    // currentUserをオブジェクトとして定義（ここを変更）
     const currentUser = {
         employeeNo: localStorage.getItem('employeeNo') || 'A1002',
         name: localStorage.getItem('userName') || ''
@@ -33,9 +32,16 @@ const RentalStatus = ({ onBack }) => {
         try {
             setLoading(true);
             const response = await fetch('/api/rental/status');
-            const data = await response.json();
 
-            const sortedRentals = data.sort((a, b) => {
+            if (!response.ok) {
+                throw new Error('データの取得に失敗しました');
+            }
+
+            const data = await response.json();
+            const rentalData = Array.isArray(data) ? data : [];
+
+            const sortedRentals = rentalData.sort((a, b) => {
+                if (!a.assetNo || !b.assetNo) return 0;
                 return a.assetNo.localeCompare(b.assetNo);
             });
 
@@ -43,6 +49,8 @@ const RentalStatus = ({ onBack }) => {
             setFilteredRentals(sortedRentals);
         } catch (error) {
             console.error('貸出状況の取得エラー:', error);
+            setRentals([]);
+            setFilteredRentals([]);
         } finally {
             setLoading(false);
         }
@@ -51,7 +59,6 @@ const RentalStatus = ({ onBack }) => {
     useEffect(() => {
         let filtered = [...rentals];
 
-        // フィルター適用
         if (filter === 'available') {
             filtered = filtered.filter(r => r.availableFlag === true);
         } else if (filter === 'rented') {
@@ -60,7 +67,6 @@ const RentalStatus = ({ onBack }) => {
             filtered = filtered.filter(r => r.isOverdue === true);
         }
 
-        // 検索適用
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             filtered = filtered.filter(rental => {
@@ -73,9 +79,7 @@ const RentalStatus = ({ onBack }) => {
         setFilteredRentals(filtered);
     }, [filter, searchQuery, rentals]);
 
-    const handleSearch = () => {
-        // searchQueryの変更でuseEffectが動作
-    };
+    const handleSearch = () => { };
 
     const handleClearSearch = () => {
         setSearchQuery('');
@@ -105,8 +109,6 @@ const RentalStatus = ({ onBack }) => {
 
     const handleRent = async (formData) => {
         try {
-            console.log('送信する貸出データ:', formData);
-
             const response = await fetch('/api/rental/rent', {
                 method: 'POST',
                 headers: {
@@ -234,7 +236,7 @@ const RentalStatus = ({ onBack }) => {
             {loading ? (
                 <div className="loading">読み込み中...</div>
             ) : (
-                <>
+                <div>
                     <div className="rental-table-container">
                         <div className={`rental-table-wrapper ${detailView ? 'detail-view' : ''}`}>
                             <RentalTable
@@ -265,7 +267,7 @@ const RentalStatus = ({ onBack }) => {
                             •••
                         </button>
                     </div>
-                </>
+                </div>
             )}
 
             {showHistoryModal && (
@@ -279,9 +281,20 @@ const RentalStatus = ({ onBack }) => {
             {showDetailModal && selectedDevice && (
                 <RentalDetailModal
                     device={selectedDevice}
-                    onClose={() => setShowDetailModal(false)}
-                    onRent={handleRent}
-                    onReturn={handleReturn}
+                    onClose={() => {
+                        setShowDetailModal(false);
+                        setSelectedDevice(null);
+                    }}
+                    onRent={() => {
+                        fetchRentalStatus();
+                        setShowDetailModal(false);
+                        setSelectedDevice(null);
+                    }}
+                    onReturn={() => {
+                        fetchRentalStatus();
+                        setShowDetailModal(false);
+                        setSelectedDevice(null);
+                    }}
                     currentUser={currentUser}
                 />
             )}

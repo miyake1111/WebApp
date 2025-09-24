@@ -174,3 +174,78 @@
         margin: 8px 0;
     }
 }
+
+/* 既存のスタイルに追加 */
+
+/* 複数カードのグリッドレイアウト */
+.rentals-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: 100%;
+}
+
+    /* 複数貸出時のカード調整 */
+    .rentals-grid .rental-status-card {
+        padding: 60px 80px;
+        min-height: 400px;
+        position: relative;
+    }
+
+    .rentals-grid .status-header {
+        position: static;
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    .rentals-grid .rental-details {
+        position: static;
+        margin: 20px 0;
+    }
+
+        .rentals-grid .rental-details p {
+            font-size: 24px;
+            margin: 15px 0;
+        }
+
+    .rentals-grid .return-button {
+        position: absolute;
+        bottom: 20px;
+        right: 40px;
+        padding: 15px 40px;
+        font-size: 24px;
+    }
+
+/* タブレット対応 */
+@media (max-width: 1024px) {
+    .rentals-grid .rental-status-card {
+        padding: 40px;
+        min-height: 300px;
+    }
+
+    .rentals-grid .return-button {
+        position: static;
+        margin-top: 20px;
+        width: 100%;
+    }
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .rentals-grid {
+        gap: 20px;
+    }
+
+        .rentals-grid .rental-status-card {
+            padding: 20px;
+            min-height: auto;
+        }
+
+        .rentals-grid .status-header {
+            font-size: 18px;
+        }
+
+        .rentals-grid .rental-details p {
+            font-size: 14px;
+        }
+}

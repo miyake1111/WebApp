@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -288,7 +289,8 @@ namespace SUSWebApp.Server.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-        // 特定ユーザーの貸出情報を取得
+
+        // 特定ユーザーの貸出情報を取得（単一）
         [HttpGet("user/{employeeNo}")]
         public IActionResult GetUserRentalInfo(string employeeNo)
         {
@@ -336,6 +338,55 @@ namespace SUSWebApp.Server.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        // 特定ユーザーの貸出情報を取得（複数）
+        [HttpGet("user/{employeeNo}/all")]
+        public IActionResult GetUserRentalsAll(string employeeNo)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+
+                var query = @"
+            SELECT 
+                r.rental_id as rentalId,
+                r.asset_no as assetNo,
+                r.rental_date as rentalDate,
+                r.due_date as dueDate
+            FROM ""TRN_RENTAL"" r
+            WHERE r.employee_no = @EmployeeNo
+            AND r.available_flag = FALSE
+            AND r.return_date IS NULL
+            ORDER BY r.rental_date DESC";
+
+                var rentals = new List<object>();
+                using var cmd = new NpgsqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@EmployeeNo", employeeNo);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    rentals.Add(new
+                    {
+                        rentalId = Convert.ToInt32(reader["rentalId"]),
+                        assetNo = reader["assetNo"]?.ToString(),
+                        rentalDate = reader["rentalDate"] != DBNull.Value
+                            ? Convert.ToDateTime(reader["rentalDate"]).ToString("yyyy/MM/dd")
+                            : "-",
+                        dueDate = reader["dueDate"] != DBNull.Value
+                            ? Convert.ToDateTime(reader["dueDate"]).ToString("yyyy/MM/dd")
+                            : "-"
+                    });
+                }
+
+                return Ok(new { success = true, rentals = rentals });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
             }
         }
 

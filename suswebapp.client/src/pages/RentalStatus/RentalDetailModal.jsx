@@ -5,39 +5,95 @@ const RentalDetailModal = ({ device, onClose, onRent, onReturn, currentUser }) =
     const [rentalDate, setRentalDate] = useState(new Date().toISOString().split('T')[0]);
     const [dueDate, setDueDate] = useState('');
 
-    const employeeNo = currentUser || localStorage.getItem('employeeNo') || 'A1002';
+    const employeeNo = currentUser?.employeeNo || localStorage.getItem('employeeNo') || 'A1002';
 
-    const handleRent = () => {
-        if (!dueDate) {
-            alert('返却締切日を入力してください');
+    const handleRent = async () => {
+        if (!rentalDate || !dueDate) {
+            alert('貸出日と返却締切日を入力してください');
             return;
         }
 
-        const rentalData = {
-            assetNo: device.assetNo,
-            employeeNo: employeeNo,
-            rentalDate: rentalDate,
-            dueDate: dueDate
-        };
+        try {
+            const currentEmployeeNo = localStorage.getItem('employeeNo') || 'A1002';
 
-        console.log('送信する貸出データ:', rentalData);
-        onRent(rentalData);
-        onClose();
+            const requestData = {
+                assetNo: device.assetNo,
+                employeeNo: currentEmployeeNo,
+                rentalDate: rentalDate,
+                dueDate: dueDate
+            };
+
+            console.log('送信データ:', requestData);
+
+            const response = await fetch('/api/rental/rent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('貸出処理が完了しました');
+                if (onRent) {
+                    onRent();
+                }
+                onClose();
+            } else {
+                alert(result.message || '貸出処理に失敗しました');
+            }
+        } catch (error) {
+            console.error('貸出エラー:', error);
+            alert('貸出処理中にエラーが発生しました');
+        }
     };
 
-    const handleReturn = () => {
+    const handleReturn = async () => {
         if (!window.confirm('返却してよろしいですか？')) {
             return;
         }
 
-        const returnData = {
-            assetNo: device.assetNo,
-            employeeNo: device.employeeNo,
-            returnDate: new Date().toISOString().split('T')[0]
-        };
+        try {
+            // まず現在のユーザーの貸出情報を取得してrental_idを取得
+            const rentalResponse = await fetch(`/api/rental/user/${device.employeeNo}/all`);
+            const rentalData = await rentalResponse.json();
 
-        onReturn(returnData);
-        onClose();
+            if (!rentalData.success || !rentalData.rentals || rentalData.rentals.length === 0) {
+                alert('貸出情報が見つかりません');
+                return;
+            }
+
+            // 該当する資産番号の貸出情報を探す
+            const targetRental = rentalData.rentals.find(r => r.assetNo === device.assetNo);
+
+            if (!targetRental) {
+                alert('該当する貸出情報が見つかりません');
+                return;
+            }
+
+            // rental_idを使って返却処理
+            const returnResponse = await fetch(`/api/rental/return/${targetRental.rentalId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (returnResponse.ok) {
+                alert('返却処理が完了しました');
+                if (onReturn) {
+                    onReturn();
+                }
+                onClose();
+            } else {
+                alert('返却処理に失敗しました');
+            }
+        } catch (error) {
+            console.error('返却エラー:', error);
+            alert('返却処理中にエラーが発生しました');
+        }
     };
 
     const isCurrentUserRenting = device.employeeNo === employeeNo;

@@ -70,9 +70,27 @@
             color: white;
         }
 
-    /* ログアウトボタンは常に赤 */
-    .nav-menu .logout-btn {
+    /* 下部ボタングループ */
+    .nav-menu .bottom-buttons {
         margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* パスワード変更ボタン */
+    .nav-menu .password-update-btn {
+        background-color: #3498db;
+        color: white;
+    }
+
+        .nav-menu .password-update-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+    /* ログアウトボタン */
+    .nav-menu .logout-btn {
         background-color: #EA5455;
         color: white;
     }
@@ -87,20 +105,7 @@
     background-color: #f5f5f5;
     padding: 0;
     overflow-y: auto;
-    display: flex; /* 追加 */
-    justify-content: center; /* 追加 */
-    align-items: center; /* 追加 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-
-/* パスワード変更ボタン */
-.nav-menu .password-update-btn {
-    background-color: #3498db;
-    color: white;
-    margin-top: 500px;
-    margin-bottom: 10px;
-}
-
-    .nav-menu .password-update-btn:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-    }
