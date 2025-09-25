@@ -30,6 +30,19 @@ const Dashboard = ({ user }) => {
         }
     };
 
+    // 期限超過チェック関数を追加
+    const isOverdue = (dueDate) => {
+        if (!dueDate || dueDate === '-') return false;
+
+        // 日付形式を変換（yyyy/MM/dd → yyyy-MM-dd）
+        const due = new Date(dueDate.replace(/\//g, '-'));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        due.setHours(0, 0, 0, 0);
+
+        return due < today;
+    };
+
     const handleReturn = async (rentalId, assetNo) => {
         if (!window.confirm(`${assetNo}を返却してよろしいですか？`)) {
             return;
@@ -73,7 +86,10 @@ const Dashboard = ({ user }) => {
                                 <div className="rental-details">
                                     <p>貸出機器：{rental.assetNo}</p>
                                     <p>貸出日：{rental.rentalDate}</p>
-                                    <p>返却締切日：{rental.dueDate}</p>
+                                    <p className={isOverdue(rental.dueDate) ? 'overdue-text' : ''}>
+                                        返却締切日：{rental.dueDate}
+                                        {isOverdue(rental.dueDate) && ' (期限超過)'}
+                                    </p>
                                 </div>
                                 <button
                                     className="return-button"

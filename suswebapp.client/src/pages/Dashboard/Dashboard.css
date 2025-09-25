@@ -216,6 +216,26 @@
         font-size: 24px;
     }
 
+/* 期限超過テキスト */
+.overdue-text {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+/* 単一カードの期限超過 */
+.rental-details .overdue-text {
+    color: #e74c3c !important;
+    font-weight: bold;
+    font-size: 42px;
+}
+
+/* 複数カードグリッドの期限超過 */
+.rentals-grid .rental-details .overdue-text {
+    color: #e74c3c !important;
+    font-weight: bold;
+    font-size: 24px;
+}
+
 /* タブレット対応 */
 @media (max-width: 1024px) {
     .rentals-grid .rental-status-card {

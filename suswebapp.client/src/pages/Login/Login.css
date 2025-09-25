@@ -149,6 +149,29 @@ body {
         box-shadow: none;
     }
 
+/* Chromium系ブラウザ（Chrome, Edge）のパスワード表示アイコンの色変更 */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    color: #000000;
+    background-color: transparent;
+}
+
+/* Webkit系ブラウザ用 */
+input[type="password"]::-webkit-textfield-decoration-container {
+    filter: invert(1);
+}
+
+/* Edge専用 */
+input[type="password"]::-ms-reveal {
+    filter: invert(1);
+}
+
+/* パスワードフィールド全体の調整（必要に応じて） */
+.form-input[type="password"] {
+    color: #34495e; /* テキストの色 */
+    background-color: #ffffff; /* 背景色を明確に白に */
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 480px) {
     .login-container {

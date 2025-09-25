@@ -83,6 +83,7 @@ const Login = ({ onLoginSuccess }) => {
                             required
                             className="form-input"
                             disabled={isLoading}
+                            autoComplete="username"
                         />
                     </div>
 
@@ -96,6 +97,7 @@ const Login = ({ onLoginSuccess }) => {
                             required
                             className="form-input"
                             disabled={isLoading}
+                            autoComplete="current-password"
                         />
                     </div>
 
