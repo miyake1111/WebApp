@@ -28,11 +28,38 @@
     padding: 350px;
     width: 100%;
     position: relative;
-    display: flex; /* 追加 */
-    flex-direction: column; /* 追加 */
-    align-items: center; /* 追加 */
-    justify-content: center; /* 追加 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+    /* 社員氏名表示 - 貸出なし時 */
+    .rental-status-card > .employee-name {
+        position: absolute;
+        top: 80px;
+        left: 80px;
+        font-size: 48px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0;
+        padding: 0;
+        border: none;
+        text-align: left;
+    }
+
+    /* 貸出なし時のステータスヘッダー位置調整 */
+    .rental-status-card > .status-header {
+        position: absolute;
+        top: 180px;
+        left: 80px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        font-size: 48px;
+        font-weight: bold;
+        color: #000;
+    }
 
 .status-header {
     display: flex;
@@ -41,11 +68,8 @@
     margin-bottom: 30px;
     font-size: 48px;
     flex-wrap: wrap;
-    position: absolute; /* 追加 */
-    top: 80px; /* 追加 */
-    left: 80px; /* 追加 */
-    font-weight: bold; /* 追加：太字に */
-    color: #000; /* 追加：黒色に */
+    font-weight: bold;
+    color: #000;
 }
 
 /* ステータスバッジ */
@@ -54,7 +78,7 @@
     border-radius: 30px;
     font-weight: bold;
     color: white;
-    font-size: 42px; /* 追加：文字サイズ指定 */
+    font-size: 42px;
 }
 
     .status-badge.rental {
@@ -68,16 +92,16 @@
 /* 貸出詳細 */
 .rental-details {
     margin: 20px 0;
-    position: absolute; /* 追加 */
-    top: 180px; /* 追加 */
-    left: 80px; /* 追加 */
+    position: absolute;
+    top: 180px;
+    left: 80px;
 }
 
     .rental-details p {
         margin: 20px 0;
         font-size: 42px;
         color: #333;
-        font-weight: 500; /* 追加：少し太く */
+        font-weight: 500;
     }
 
 /* 返却ボタン */
@@ -91,7 +115,7 @@
     border: none;
     border-radius: 15px;
     font-size: 42px;
-    font-weight: bold; /* 追加：太字に */
+    font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -99,83 +123,6 @@
     .return-button:hover {
         background-color: #229954;
     }
-
-/* タブレット対応 */
-@media (max-width: 1024px) {
-    .dashboard-container h1 {
-        font-size: 28px;
-    }
-
-    .rental-status-card {
-        padding: 30px;
-    }
-
-    .return-button {
-        position: static;
-        margin-top: 20px;
-        width: 100%;
-    }
-}
-
-/* モバイル対応 */
-@media (max-width: 768px) {
-    .dashboard-container {
-        padding: 15px;
-    }
-
-        .dashboard-container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-    .rental-status-card {
-        padding: 20px;
-        border-radius: 15px;
-    }
-
-    .status-header {
-        font-size: 16px;
-        gap: 15px;
-    }
-
-    .status-badge {
-        padding: 6px 20px;
-        font-size: 14px;
-    }
-
-    .rental-details p {
-        font-size: 14px;
-    }
-
-    .return-button {
-        padding: 12px 30px;
-        font-size: 16px;
-    }
-}
-
-/* スマートフォン対応 */
-@media (max-width: 480px) {
-    .dashboard-container h1 {
-        font-size: 20px;
-    }
-
-    .rental-status-card {
-        padding: 15px;
-    }
-
-    .status-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .rental-details p {
-        font-size: 13px;
-        margin: 8px 0;
-    }
-}
-
-/* 既存のスタイルに追加 */
 
 /* 複数カードのグリッドレイアウト */
 .rentals-grid {
@@ -192,6 +139,17 @@
         position: relative;
     }
 
+    /* 複数貸出時の社員氏名 */
+    .rentals-grid .employee-name {
+        position: static;
+        font-size: 28px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        text-align: center;
+        border-bottom: 2px solid #b0b0b0;
+    }
+
+    /* 複数貸出時のステータスヘッダー */
     .rentals-grid .status-header {
         position: static;
         font-size: 32px;
@@ -238,6 +196,35 @@
 
 /* タブレット対応 */
 @media (max-width: 1024px) {
+    .dashboard-container h1 {
+        font-size: 28px;
+    }
+
+    .rental-status-card {
+        padding: 30px;
+    }
+
+        .rental-status-card > .employee-name {
+            position: static;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .rental-status-card > .status-header {
+            position: static;
+            font-size: 28px;
+        }
+
+    .rental-details {
+        position: static;
+    }
+
+    .return-button {
+        position: static;
+        margin-top: 20px;
+        width: 100%;
+    }
+
     .rentals-grid .rental-status-card {
         padding: 40px;
         min-height: 300px;
@@ -252,6 +239,47 @@
 
 /* モバイル対応 */
 @media (max-width: 768px) {
+    .dashboard-container {
+        padding: 15px;
+    }
+
+        .dashboard-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+    .rental-status-card {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+        .rental-status-card > .employee-name {
+            font-size: 24px;
+        }
+
+    .status-header {
+        font-size: 16px;
+        gap: 15px;
+    }
+
+    .rental-status-card > .status-header {
+        font-size: 16px;
+    }
+
+    .status-badge {
+        padding: 6px 20px;
+        font-size: 14px;
+    }
+
+    .rental-details p {
+        font-size: 14px;
+    }
+
+    .return-button {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+
     .rentals-grid {
         gap: 20px;
     }
@@ -261,6 +289,10 @@
             min-height: auto;
         }
 
+        .rentals-grid .employee-name {
+            font-size: 20px;
+        }
+
         .rentals-grid .status-header {
             font-size: 18px;
         }
@@ -268,4 +300,30 @@
         .rentals-grid .rental-details p {
             font-size: 14px;
         }
+}
+
+/* スマートフォン対応 */
+@media (max-width: 480px) {
+    .dashboard-container h1 {
+        font-size: 20px;
+    }
+
+    .rental-status-card {
+        padding: 15px;
+    }
+
+        .rental-status-card > .employee-name {
+            font-size: 20px;
+        }
+
+    .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .rental-details p {
+        font-size: 13px;
+        margin: 8px 0;
+    }
 }

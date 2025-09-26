@@ -6,6 +6,7 @@ const Dashboard = ({ user }) => {
     const [loading, setLoading] = useState(true);
 
     const employeeNo = user?.employeeNo || localStorage.getItem('employeeNo') || 'A1002';
+    const employeeName = user?.name || user?.employeeName || localStorage.getItem('userName') || 'ユーザー名';
 
     useEffect(() => {
         fetchRentalInfo();
@@ -30,11 +31,10 @@ const Dashboard = ({ user }) => {
         }
     };
 
-    // 期限超過チェック関数を追加
+    // 期限超過チェック関数
     const isOverdue = (dueDate) => {
         if (!dueDate || dueDate === '-') return false;
 
-        // 日付形式を変換（yyyy/MM/dd → yyyy-MM-dd）
         const due = new Date(dueDate.replace(/\//g, '-'));
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -73,12 +73,14 @@ const Dashboard = ({ user }) => {
             <div className="dashboard-wrapper">
                 {loading ? (
                     <div className="rental-status-card">
+                        <div className="employee-name">{employeeName}</div>
                         <p>読み込み中...</p>
                     </div>
                 ) : rentals.length > 0 ? (
                     <div className="rentals-grid">
                         {rentals.map((rental) => (
                             <div key={rental.rentalId} className="rental-status-card">
+                                <div className="employee-name">{employeeName}</div>
                                 <div className="status-header">
                                     <span>貸出状態：</span>
                                     <span className="status-badge rental">貸出中</span>
@@ -102,6 +104,7 @@ const Dashboard = ({ user }) => {
                     </div>
                 ) : (
                     <div className="rental-status-card">
+                        <div className="employee-name">{employeeName}</div>
                         <div className="status-header">
                             <span>貸出状態：</span>
                             <span className="status-badge available">なし</span>
