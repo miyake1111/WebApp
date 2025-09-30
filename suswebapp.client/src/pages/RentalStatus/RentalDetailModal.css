@@ -1,219 +1,240 @@
-﻿/* DeviceModalと完全に同じスタイルを適用 */
+﻿/* DeviceModalと完全に同じスタイルを適用（コンポーネント間の統一性） */
+
+/* モーダルオーバーレイ - 背景の暗幕 */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    position: fixed; /* ビューポートに対して固定配置 */
+    top: 0; /* 上端から0 */
+    left: 0; /* 左端から0 */
+    right: 0; /* 右端から0 */
+    bottom: 0; /* 下端から0（画面全体を覆う） */
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 水平方向中央配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    z-index: 1000; /* 最前面に表示 */
 }
 
+/* モーダルコンテンツ本体 */
 .modal-content {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: white; /* 白背景 */
+    border-radius: 15px; /* 角丸15px */
+    padding: 30px; /* 内側余白30px */
+    width: 90%; /* 親要素の90%幅 */
+    max-width: 800px; /* 最大幅800pxに制限 */
+    max-height: 80vh; /* ビューポートの80%高さまで */
+    overflow-y: auto; /* 縦スクロール可能 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* 影で立体感 */
 }
 
+    /* モーダルタイトル */
     .modal-content h2 {
-        margin-bottom: 20px;
-        color: #333;
-        font-size: 24px;
+        margin-bottom: 20px; /* 下方向余白20px */
+        color: #333; /* ダークグレー文字 */
+        font-size: 24px; /* フォントサイズ24px */
     }
 
-/* 故障警告 */
+/* 故障警告表示エリア */
 .malfunction-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #ffeaa7;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
+    background-color: #fff3cd; /* 薄い黄色背景（警告色） */
+    color: #856404; /* 暗い黄色文字 */
+    padding: 12px; /* 内側余白12px */
+    border-radius: 6px; /* 角丸6px */
+    border: 1px solid #ffeaa7; /* 黄色の境界線 */
+    margin-bottom: 20px; /* 下方向余白20px */
+    text-align: center; /* 中央寄せ */
+    font-weight: 600; /* セミボールド */
 }
 
+/* フォームコンテナ（左右2列レイアウト） */
 .form-container {
-    display: flex;
-    gap: 30px;
+    display: flex; /* Flexboxレイアウト */
+    gap: 30px; /* 列間の間隔30px */
 }
 
+/* フォーム左側・右側の列 */
 .form-left, .form-right {
-    flex: 1;
+    flex: 1; /* 均等幅 */
 }
 
+/* フォームグループ（各入力項目） */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 15px; /* 下方向余白15px */
 }
 
+    /* ラベル */
     .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        color: #555;
-        font-weight: 500;
+        display: block; /* ブロック要素として表示 */
+        margin-bottom: 5px; /* 下方向余白5px */
+        color: #555; /* グレー文字 */
+        font-weight: 500; /* 中太字 */
     }
 
+    /* テキスト入力、数値入力、日付入力、テキストエリア */
     .form-group input[type="text"],
     .form-group input[type="number"],
     .form-group input[type="date"],
     .form-group textarea {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
+        width: 100%; /* 幅100% */
+        padding: 8px 12px; /* 内側余白 */
+        border: 1px solid #ddd; /* 薄いグレー境界線 */
+        border-radius: 4px; /* 角丸4px */
+        font-size: 14px; /* フォントサイズ14px */
     }
 
-        /* 無効化されたフィールド */
+        /* 無効化されたフィールド（読み取り専用） */
         .form-group input:disabled,
         .form-group textarea:disabled {
-            background-color: #f8f9fa;
-            color: #495057;
-            cursor: not-allowed;
+            background-color: #f8f9fa; /* 薄いグレー背景 */
+            color: #495057; /* ダークグレー文字 */
+            cursor: not-allowed; /* 禁止カーソル */
         }
 
     /* チェックボックス */
     .form-group input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
+        width: 20px; /* 幅20px */
+        height: 20px; /* 高さ20px */
+        cursor: pointer; /* ポインターカーソル */
     }
 
+        /* 無効化されたチェックボックス */
         .form-group input[type="checkbox"]:disabled {
-            cursor: not-allowed;
+            cursor: not-allowed; /* 禁止カーソル */
         }
 
+    /* テキストエリアのリサイズ方向 */
     .form-group textarea {
-        resize: vertical;
+        resize: vertical; /* 縦方向のみリサイズ可能 */
     }
 
+/* 横並びフォームグループ（日付入力用） */
 .form-group-row {
-    display: flex;
-    gap: 15px;
+    display: flex; /* Flexboxレイアウト */
+    gap: 15px; /* 項目間の間隔15px */
 }
 
     .form-group-row .form-group {
-        flex: 1;
+        flex: 1; /* 均等幅 */
     }
 
-/* 使用者情報の強調 */
+/* 使用者情報の強調表示（貸出中の場合） */
 .form-group input.user-info {
-    background-color: #e7f3ff;
-    border-color: #b8daff;
-    font-weight: 500;
+    background-color: #e7f3ff; /* 薄い青背景 */
+    border-color: #b8daff; /* 青境界線 */
+    font-weight: 500; /* 中太字 */
 }
 
-/* モーダルボタン */
+/* モーダルボタングループ */
 .modal-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 中央配置 */
+    gap: 20px; /* ボタン間の間隔20px */
+    margin-top: 30px; /* 上方向余白30px */
 }
 
+/* 保存・返却・キャンセルボタン共通スタイル */
 .save-btn, .return-btn, .cancel-btn {
-    padding: 10px 40px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    padding: 10px 40px; /* 内側余白 */
+    border: none; /* 境界線なし */
+    border-radius: 6px; /* 角丸6px */
+    font-size: 16px; /* フォントサイズ16px */
+    cursor: pointer; /* ポインターカーソル */
+    transition: background-color 0.3s; /* 背景色の変化をアニメーション */
 }
 
+/* 保存（貸出）ボタン - 緑 */
 .save-btn {
-    background-color: #27ae60;
-    color: white;
+    background-color: #27ae60; /* 緑背景 */
+    color: white; /* 白文字 */
 }
 
     .save-btn:hover {
-        background-color: #229954;
+        background-color: #229954; /* ホバー時は濃い緑 */
     }
 
+/* 返却ボタン - 青 */
 .return-btn {
-    background-color: #17a2b8;
-    color: white;
+    background-color: #17a2b8; /* 青背景 */
+    color: white; /* 白文字 */
 }
 
     .return-btn:hover {
-        background-color: #138496;
+        background-color: #138496; /* ホバー時は濃い青 */
     }
 
+/* キャンセルボタン - 赤 */
 .cancel-btn {
-    background-color: #e74c3c;
-    color: white;
+    background-color: #e74c3c; /* 赤背景 */
+    color: white; /* 白文字 */
 }
 
     .cancel-btn:hover {
-        background-color: #c0392b;
+        background-color: #c0392b; /* ホバー時は濃い赤 */
     }
 
-/* エラーテキスト */
+/* エラーテキスト表示 */
 .error-text {
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 4px;
-    display: block;
+    color: #dc3545; /* 赤色文字 */
+    font-size: 12px; /* フォントサイズ12px */
+    margin-top: 4px; /* 上方向余白4px */
+    display: block; /* ブロック要素として表示 */
 }
 
+/* エラー状態の入力フィールド（期限超過など） */
 .form-group input.error-text {
-    color: #dc3545 !important;
-    font-weight: 600;
+    color: #dc3545 !important; /* 赤色文字（優先） */
+    font-weight: 600; /* セミボールド */
 }
 
-/* 保存ボタンの無効化状態 */
+/* 保存・返却ボタンの無効化状態 */
 .save-btn:disabled,
 .return-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #95a5a6;
+    opacity: 0.6; /* 透明度60% */
+    cursor: not-allowed; /* 禁止カーソル */
+    background-color: #95a5a6; /* グレー背景 */
 }
 
     .save-btn:disabled:hover,
     .return-btn:disabled:hover {
-        background-color: #95a5a6;
+        background-color: #95a5a6; /* ホバー時も変化なし */
     }
 
-/* スクロールバー */
+/* スクロールバーカスタマイズ（Webkit系ブラウザ） */
 .modal-content::-webkit-scrollbar {
-    width: 8px;
+    width: 8px; /* スクロールバー幅8px */
 }
 
 .modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+    background: #f1f1f1; /* トラック背景色 */
+    border-radius: 4px; /* 角丸4px */
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: #888; /* つまみの色 */
+    border-radius: 4px; /* 角丸4px */
 }
 
     .modal-content::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: #555; /* ホバー時は濃いグレー */
     }
 
-/* レスポンシブ対応 */
+/* レスポンシブ対応（768px以下） */
 @media (max-width: 768px) {
+    /* フォームコンテナを縦並びに */
     .form-container {
         flex-direction: column;
     }
 
+    /* 日付入力も縦並びに */
     .form-group-row {
         flex-direction: column;
     }
 
+    /* ボタンも縦並びに */
     .modal-buttons {
         flex-direction: column;
     }
 
+    /* ボタンを幅100%に */
     .save-btn, .return-btn, .cancel-btn {
         width: 100%;
     }

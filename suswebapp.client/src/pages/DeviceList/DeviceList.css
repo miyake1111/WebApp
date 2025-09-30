@@ -1,28 +1,32 @@
+/* デバイスリストのメインコンテナ */
 .device-list-container {
     padding: 30px;
-    height: 100vh;
+    height: 100vh; /* ビューポート全体の高さ */
     background-color: #f5f5f5;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
 }
 
+/* ヘッダー部分（タイトルと戻るボタン） */
 .device-list-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* 左右に配置 */
     align-items: center;
     margin-bottom: 20px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
+    /* ページタイトル */
     .device-list-header h2 {
         font-size: 28px;
         color: #333;
     }
 
+/* メニューに戻るボタン */
 .back-btn {
     padding: 10px 20px;
-    background-color: #95a5a6;
+    background-color: #95a5a6; /* グレー背景 */
     color: white;
     border: none;
     border-radius: 6px;
@@ -31,14 +35,14 @@
 }
 
     .back-btn:hover {
-        background-color: #7f8c8d;
+        background-color: #7f8c8d; /* ホバー時は濃いグレー */
     }
 
-/* コントロール全体のコンテナ */
+/* コントロール全体のコンテナ（ボタンと検索） */
 .controls-container {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+    align-items: flex-end; /* 下端揃え */
+    justify-content: space-between; /* 左右に分割 */
     gap: 10px;
     margin-bottom: 0px;
     padding: 0 20px;
@@ -65,7 +69,7 @@
     gap: 4px;
 }
 
-/* モードボタン */
+/* モードボタン（追加・削除・編集） */
 .mode-btn {
     width: 36px;
     height: 36px;
@@ -81,10 +85,11 @@
 }
 
     .mode-btn:hover {
-        transform: scale(1.1);
+        transform: scale(1.1); /* 拡大効果 */
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
+/* 追加モードボタン - 青色 */
 .add-mode-btn {
     border-color: #3498db;
     color: #3498db;
@@ -95,27 +100,31 @@
         color: white;
     }
 
+/* 削除モードボタン - 赤色 */
 .delete-mode-btn {
     border-color: #e74c3c;
     color: #e74c3c;
 }
 
+    /* 削除モードがアクティブな時 */
     .delete-mode-btn.active {
         background-color: #e74c3c;
         color: white;
     }
 
+/* 編集モードボタン - オレンジ色 */
 .edit-mode-btn {
     border-color: #f39c12;
     color: #f39c12;
 }
 
+    /* 編集モードがアクティブな時 */
     .edit-mode-btn.active {
         background-color: #f39c12;
         color: white;
     }
 
-/* 検索関連ボタン */
+/* 検索関連ボタン（クリア、検索、履歴） */
 .clear-search-btn,
 .search-btn,
 .history-btn {
@@ -140,7 +149,7 @@
         transform: scale(1.05);
     }
 
-/* 検索入力 */
+/* 検索入力フィールド */
 .search-input {
     width: 300px;
     padding: 6px 12px;
@@ -153,7 +162,7 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #3498db;
+        border-color: #3498db; /* フォーカス時は青枠 */
     }
 
 /* アイコンスタイル */
@@ -171,53 +180,55 @@
 
 /* テーブルコンテナ全体 */
 .device-table-container {
-    flex: 1;
+    flex: 1; /* 残りスペースを使用 */
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    min-height: 0; /* flexアイテムの縮小を許可 */
     overflow: hidden;
     margin-top: 20px;
 }
 
-/* テーブルラッパー - スクロール修正 */
+/* テーブルラッパー - スクロール領域 */
 .device-table-wrapper {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: auto;
+    overflow-y: auto; /* 縦スクロール */
+    overflow-x: auto; /* 横スクロール */
     padding: 0;
     background: transparent;
     box-shadow: none;
     border-radius: 0;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 300px); /* 画面サイズに応じて調整 */
 }
 
-    /* 詳細ビュー時 */
+    /* 詳細ビュー時 - 横幅が増える */
     .device-table-wrapper.detail-view {
         overflow-x: auto;
     }
 
         .device-table-wrapper.detail-view .device-table {
-            min-width: 1400px;
+            min-width: 1400px; /* 詳細表示時の最小幅 */
         }
 
-/* テーブル */
+/* デバイステーブル本体 */
 .device-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1200px;
+    min-width: 1200px; /* 通常表示時の最小幅 */
 }
 
+    /* テーブルヘッダー */
     .device-table thead {
-        position: sticky;
+        position: sticky; /* スクロール時に固定 */
         top: 0;
         z-index: 10;
     }
 
+    /* ヘッダーセル */
     .device-table th {
-        background-color: #34495e;
+        background-color: #34495e; /* ダークグレー背景 */
         color: white;
         padding: 12px;
         text-align: left;
@@ -226,17 +237,19 @@
         top: 0;
     }
 
+    /* データセル */
     .device-table td {
         padding: 12px;
         border-bottom: 1px solid #ecf0f1;
         color: #2c3e50;
     }
 
+    /* 行のホバー効果 */
     .device-table tr:hover {
         background-color: #f8f9fa;
     }
 
-/* 資産番号セル */
+/* 資産番号セル（ボタンとテキストを横並び） */
 .asset-no-cell {
     display: flex;
     align-items: center;
@@ -259,6 +272,7 @@
     transition: all 0.2s ease;
 }
 
+/* インライン編集ボタン - オレンジ */
 .inline-edit-btn {
     border-color: #f39c12;
     color: #f39c12;
@@ -269,6 +283,7 @@
         color: white;
     }
 
+/* インライン削除ボタン - 赤 */
 .inline-delete-btn {
     border-color: #e74c3c;
     color: #e74c3c;
@@ -280,18 +295,19 @@
         color: white;
     }
 
-/* テーブルフッター */
+/* テーブルフッター（件数表示） */
 .table-footer {
     padding: 15px 20px;
     background-color: #f8f9fa;
     border-top: 2px solid #dee2e6;
-    border-radius: 0 0 8px 8px;
-    flex-shrink: 0;
+    border-radius: 0 0 8px 8px; /* 下部のみ角丸 */
+    flex-shrink: 0; /* 縮小を防ぐ */
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
 
+/* 件数表示テキスト */
 .record-count {
     font-size: 14px;
     color: #6c757d;
@@ -306,6 +322,7 @@
     flex-shrink: 0;
 }
 
+/* 詳細表示切替ボタン */
 .detail-toggle-btn {
     width: 40px;
     height: 30px;
@@ -314,13 +331,13 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 20px;
-    letter-spacing: 2px;
+    letter-spacing: 2px; /* 点を離して表示 */
     transition: all 0.2s ease;
     color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 15px;
+    padding-bottom: 15px; /* 縦位置調整 */
 }
 
     .detail-toggle-btn:hover {
@@ -330,21 +347,21 @@
 
 /* 検索ハイライト */
 .highlight {
-    background-color: #fff3cd;
+    background-color: #fff3cd; /* 黄色背景でハイライト */
     padding: 2px 4px;
     border-radius: 3px;
     font-weight: 600;
 }
 
-/* 故障ステータス */
+/* 故障ステータス表示 */
 .status-broken {
-    color: #e74c3c;
+    color: #e74c3c; /* 赤色で警告 */
     font-weight: bold;
 }
 
 /* リース期限切れの行のスタイル */
 .device-table tbody tr.lease-expired {
-    background-color: #a9a9a9;
+    background-color: #a9a9a9; /* グレー背景 */
     color: #666;
     opacity: 0.8;
 }
@@ -353,6 +370,7 @@
         background-color: #eeeeee;
     }
 
+    /* リース期限切れでもボタンは通常表示 */
     .device-table tbody tr.lease-expired .inline-edit-btn,
     .device-table tbody tr.lease-expired .inline-delete-btn {
         opacity: 1;
@@ -360,14 +378,14 @@
 
 /* 故障機器の行のスタイル */
 .device-table tbody tr.broken-device {
-    background-color: #ffcccc;
+    background-color: #ffcccc; /* 薄い赤背景 */
 }
 
     .device-table tbody tr.broken-device:hover {
         background-color: #ffdddd;
     }
 
-/* スクロールバーのスタイル - 貸出状況と統一 */
+/* スクロールバーのスタイル - Webkit系ブラウザ */
 .device-table-wrapper::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -387,12 +405,13 @@
         background: #555;
     }
 
-/* Firefox用 */
+/* Firefox用スクロールバー */
 .device-table-wrapper {
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
 }
 
+/* ローディング表示 */
 .loading {
     text-align: center;
     padding: 50px;
@@ -400,7 +419,7 @@
     color: #7f8c8d;
 }
 
-/* レスポンシブ対応 */
+/* レスポンシブ対応 - 低高さ画面 */
 @media (max-height: 600px) {
     .device-list-container {
         padding: 15px;
@@ -415,6 +434,7 @@
     }
 }
 
+/* レスポンシブ対応 - 狭い画面 */
 @media (max-width: 1200px) {
     .device-table-wrapper {
         max-width: calc(100vw - 40px);

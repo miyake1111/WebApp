@@ -1,73 +1,84 @@
-﻿/* RentalForm.css */
+﻿/* RentalForm.css - 貸出フォームモーダルのスタイル */
+
+/* 貸出フォームモーダル本体 */
 .rental-form-modal {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 500px;
-    max-width: 90vw;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+    background: white; /* 白背景 */
+    border-radius: 8px; /* 角丸8px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 影で立体感 */
+    width: 500px; /* 固定幅500px */
+    max-width: 90vw; /* ビューポートの90%を最大幅 */
+    max-height: 80vh; /* ビューポートの80%を最大高さ */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
 }
 
+/* デバイス情報表示エリア */
 .device-info {
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+    background-color: #f8f9fa; /* 薄いグレー背景 */
+    border-radius: 4px; /* 角丸4px */
+    padding: 1rem; /* 内側余白1rem */
+    margin-bottom: 1.5rem; /* 下方向余白1.5rem */
 }
 
+    /* デバイス情報の段落 */
     .device-info p {
-        margin: 0.5rem 0;
-        color: #495057;
+        margin: 0.5rem 0; /* 上下余白0.5rem */
+        color: #495057; /* グレー文字 */
     }
 
+    /* デバイス情報のラベル部分 */
     .device-info strong {
-        color: #212529;
-        margin-right: 0.5rem;
+        color: #212529; /* 濃いグレー文字 */
+        margin-right: 0.5rem; /* 右余白0.5rem */
     }
 
+/* フォームグループ（各入力項目） */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem; /* 下方向余白1.5rem */
 }
 
+    /* フォームラベル */
     .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #495057;
+        display: block; /* ブロック要素として表示 */
+        margin-bottom: 0.5rem; /* 下方向余白0.5rem */
+        font-weight: 500; /* 中太字 */
+        color: #495057; /* グレー文字 */
     }
 
+    /* 入力フィールドとテキストエリア */
     .form-group input,
     .form-group textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        font-size: 1rem;
-        transition: border-color 0.15s ease-in-out;
-        box-sizing: border-box;
+        width: 100%; /* 幅100% */
+        padding: 0.5rem; /* 内側余白0.5rem */
+        border: 1px solid #ced4da; /* グレー境界線 */
+        border-radius: 4px; /* 角丸4px */
+        font-size: 1rem; /* フォントサイズ1rem */
+        transition: border-color 0.15s ease-in-out; /* 境界線色の変化をアニメーション */
+        box-sizing: border-box; /* paddingとborderを幅に含める */
     }
 
+        /* フォーカス時のスタイル */
         .form-group input:focus,
         .form-group textarea:focus {
-            outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            outline: none; /* デフォルトアウトラインを削除 */
+            border-color: #80bdff; /* 青色境界線 */
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); /* 青色の光彩効果 */
         }
 
+/* 送信ボタン */
 .btn-submit {
-    padding: 0.5rem 1.5rem;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s;
+    padding: 0.5rem 1.5rem; /* 内側余白 */
+    background-color: #28a745; /* 緑背景（成功色） */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 1rem; /* フォントサイズ1rem */
+    transition: all 0.2s; /* すべてのプロパティを0.2秒でアニメーション */
 }
 
+    /* 送信ボタンのホバー効果 */
     .btn-submit:hover {
-        background-color: #218838;
-        transform: translateY(-1px);
+        background-color: #218838; /* 濃い緑背景 */
+        transform: translateY(-1px); /* 1px上に浮き上がる */
     }

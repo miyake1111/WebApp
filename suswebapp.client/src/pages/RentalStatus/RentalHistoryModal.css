@@ -1,210 +1,234 @@
 /* モーダル基本スタイル */
+
+/* モーダルオーバーレイ（背景の暗幕） */
 .modal-overlay {
-    position: fixed;
+    position: fixed; /* ビューポートに対して固定配置 */
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    bottom: 0; /* 画面全体を覆う */
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 水平方向中央配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    z-index: 1000; /* 最前面に表示 */
 }
 
+/* 貸出履歴モーダル本体 */
 .rental-history-modal {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 900px;
-    max-width: 90vw;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
+    background: white; /* 白背景 */
+    border-radius: 8px; /* 角丸8px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 影で立体感 */
+    width: 900px; /* 固定幅900px */
+    max-width: 90vw; /* ビューポートの90%を最大幅 */
+    max-height: 80vh; /* ビューポートの80%を最大高さ */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    padding: 20px; /* 内側余白20px */
 }
 
+    /* モーダルタイトル */
     .rental-history-modal h2 {
-        margin: 0 0 20px 0;
-        color: #333;
-        font-size: 1.5rem;
+        margin: 0 0 20px 0; /* 下方向のみ余白20px */
+        color: #333; /* ダークグレー文字 */
+        font-size: 1.5rem; /* フォントサイズ1.5rem */
     }
 
-/* フィルターコントロール */
+/* フィルターコントロール部分 */
 .filter-controls {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: space-between; /* 左右に分散配置 */
+    margin-bottom: 15px; /* 下方向余白15px */
+    gap: 10px; /* 項目間の間隔10px */
 }
 
+/* フィルターボタングループ */
 .filter-buttons {
-    display: flex;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    gap: 10px; /* ボタン間の間隔10px */
 }
 
+/* 個別のフィルターボタン */
 .filter-btn {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
+    padding: 8px 16px; /* 内側余白 */
+    border: 1px solid #ddd; /* グレー境界線 */
+    background: white; /* 白背景 */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    transition: all 0.2s; /* すべてのプロパティを0.2秒でアニメーション */
 }
 
+    /* アクティブなフィルターボタン */
     .filter-btn.active {
-        background: #3498db;
-        color: white;
-        border-color: #3498db;
+        background: #3498db; /* 青背景 */
+        color: white; /* 白文字 */
+        border-color: #3498db; /* 青境界線 */
     }
 
+    /* 非アクティブボタンのホバー効果 */
     .filter-btn:hover:not(.active) {
-        background: #f5f5f5;
+        background: #f5f5f5; /* 薄いグレー背景 */
     }
 
+/* ソートボタン */
 .sort-btn {
-    padding: 8px 16px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
+    padding: 8px 16px; /* 内側余白 */
+    background: #6c757d; /* グレー背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    transition: all 0.2s; /* すべてのプロパティを0.2秒でアニメーション */
 }
 
     .sort-btn:hover {
-        background: #5a6268;
+        background: #5a6268; /* ホバー時は濃いグレー */
     }
 
-/* 検索バー */
+/* 検索バー部分 */
 .search-container {
-    display: flex;
-    margin-bottom: 20px;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    margin-bottom: 20px; /* 下方向余白20px */
+    gap: 10px; /* 項目間の間隔10px */
 }
 
+/* 検索入力フィールド */
 .search-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    flex: 1; /* 残りスペースを使用 */
+    padding: 8px 12px; /* 内側余白 */
+    border: 1px solid #ddd; /* グレー境界線 */
+    border-radius: 4px; /* 角丸4px */
+    font-size: 14px; /* フォントサイズ14px */
 }
 
+/* 検索ボタン、クリアボタン */
 .search-btn, .clear-search-btn {
-    padding: 8px 16px;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+    padding: 8px 16px; /* 内側余白 */
+    background: #3498db; /* 青背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 16px; /* フォントサイズ16px */
 }
 
+/* クリアボタン専用スタイル */
 .clear-search-btn {
-    background: #6c757d;
+    background: #6c757d; /* グレー背景 */
 }
 
 .search-btn:hover {
-    background: #2980b9;
+    background: #2980b9; /* ホバー時は濃い青 */
 }
 
 .clear-search-btn:hover {
-    background: #5a6268;
+    background: #5a6268; /* ホバー時は濃いグレー */
 }
 
-/* テーブル */
+/* テーブル部分 */
+
+/* テーブルラッパー（スクロール領域） */
 .history-table-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    flex: 1; /* 残りスペースを使用 */
+    overflow-y: auto; /* 縦スクロール可能 */
+    border: 1px solid #ddd; /* グレー境界線 */
+    border-radius: 4px; /* 角丸4px */
+    margin-bottom: 15px; /* 下方向余白15px */
 }
 
+/* 履歴テーブル本体 */
 .history-table {
-    width: 100%;
-    border-collapse: collapse;
+    width: 100%; /* 幅100% */
+    border-collapse: collapse; /* セル間の隙間を削除 */
 }
 
+    /* テーブルヘッダー */
     .history-table thead th {
-        background: #34495e;
-        color: white;
-        padding: 12px;
-        text-align: left;
-        position: sticky;
-        top: 0;
-        z-index: 1;
+        background: #34495e; /* ダークグレー背景 */
+        color: white; /* 白文字 */
+        padding: 12px; /* 内側余白12px */
+        text-align: left; /* 左寄せ */
+        position: sticky; /* スクロール時に固定 */
+        top: 0; /* 上端に固定 */
+        z-index: 1; /* 前面に表示 */
     }
 
+    /* テーブルデータセル */
     .history-table tbody td {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
+        padding: 12px; /* 内側余白12px */
+        border-bottom: 1px solid #eee; /* 薄いグレーの下線 */
     }
 
+    /* テーブル行のホバー効果 */
     .history-table tbody tr:hover {
-        background: #f8f9fa;
+        background: #f8f9fa; /* 薄いグレー背景 */
     }
 
+/* 従業員情報表示 */
 .employee-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    gap: 2px; /* 項目間の間隔2px */
 }
 
+/* 従業員名表示 */
 .employee-name {
-    font-size: 12px;
-    color: #666;
+    font-size: 12px; /* フォントサイズ12px */
+    color: #666; /* グレー文字 */
 }
 
+/* 従業員名カナ表示 */
 .employee-kana {
-    font-size: 11px;
-    color: #999;
+    font-size: 11px; /* フォントサイズ11px */
+    color: #999; /* 薄いグレー文字 */
 }
 
+/* データなし表示 */
 .no-data {
-    text-align: center;
-    padding: 40px;
-    color: #999;
+    text-align: center; /* 中央寄せ */
+    padding: 40px; /* 内側余白40px */
+    color: #999; /* 薄いグレー文字 */
 }
 
+/* ローディング表示 */
 .loading {
-    text-align: center;
-    padding: 40px;
-    color: #666;
+    text-align: center; /* 中央寄せ */
+    padding: 40px; /* 内側余白40px */
+    color: #666; /* グレー文字 */
 }
 
-/* ハイライト */
+/* 検索ハイライト */
 .highlight {
-    background: yellow;
-    font-weight: bold;
+    background: yellow; /* 黄色背景 */
+    font-weight: bold; /* 太字 */
 }
 
-/* フッター */
+/* フッター部分 */
 .history-footer {
-    padding: 10px;
-    text-align: right;
-    color: #666;
-    font-size: 14px;
+    padding: 10px; /* 内側余白10px */
+    text-align: right; /* 右寄せ */
+    color: #666; /* グレー文字 */
+    font-size: 14px; /* フォントサイズ14px */
 }
 
-/* モーダルボタン */
+/* モーダルボタングループ */
 .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: flex-end; /* 右寄せ */
 }
 
+/* キャンセルボタン */
 .cancel-btn {
-    padding: 10px 24px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
+    padding: 10px 24px; /* 内側余白 */
+    background: #6c757d; /* グレー背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 14px; /* フォントサイズ14px */
+    transition: all 0.2s; /* すべてのプロパティを0.2秒でアニメーション */
 }
 
     .cancel-btn:hover {
-        background: #5a6268;
+        background: #5a6268; /* ホバー時は濃いグレー */
     }

@@ -1,33 +1,74 @@
 {
+  /* 起動プロファイル定義 - 異なる実行環境の設定 */
   "profiles": {
+
+    /* HTTPプロファイル - Kestrel（.NET Core組み込みWebサーバー）での実行設定 */
     "http": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
+      "commandName": "Project", // プロジェクトとして実行
+      "launchBrowser": true, // 起動時にブラウザを自動で開く
+      "launchUrl": "swagger", // ブラウザで開くURL（Swagger UIページ）
+
+      /* 環境変数の設定 */
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "ASPNETCORE_ENVIRONMENT": "Development", // 開発環境として実行（詳細エラー表示など有効）
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy" // SPAプロキシを有効化（React連携用）
       },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:61319"
+
+      "dotnetRunMessages": true, // dotnet runコマンドのメッセージを表示
+      "applicationUrl": "http://localhost:61319" // アプリケーションのURL（バックエンドサーバー）
     },
+
+    /* IIS Expressプロファイル - IIS Express経由での実行設定 */
     "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
+      "commandName": "IISExpress", // IIS Expressで実行
+      "launchBrowser": true, // 起動時にブラウザを自動で開く
+      "launchUrl": "swagger", // ブラウザで開くURL（Swagger UIページ）
+
+      /* 環境変数の設定 */
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "ASPNETCORE_ENVIRONMENT": "Development", // 開発環境として実行
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy" // SPAプロキシを有効化
       }
     }
   },
+
+  /* JSON Schemaの定義（IDEの入力補完とバリデーション用） */
   "$schema": "http://json.schemastore.org/launchsettings.json",
+
+  /* IIS/IIS Express設定 */
   "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
+    "windowsAuthentication": false, // Windows認証を無効
+    "anonymousAuthentication": true, // 匿名認証を有効（開発環境用）
+
+    /* IIS Express固有の設定 */
     "iisExpress": {
-      "applicationUrl": "http://localhost:52855",
-      "sslPort": 44379
+      "applicationUrl": "http://localhost:52855", // IIS ExpressのHTTP URL
+      "sslPort": 44379 // IIS ExpressのHTTPSポート
     }
   }
 }
+
+/**
+ * launchSettings.jsonの主要ポイント：
+ * 
+ * 1. 複数の起動プロファイル
+ *    - http: Kestrelサーバー（クロスプラットフォーム対応）
+ *    - IIS Express: Windows環境でのIIS Express実行
+ * 
+ * 2. 開発環境の設定
+ *    - ASPNETCORE_ENVIRONMENT: Development
+ *    - 開発時の詳細なエラー情報表示
+ *    - Hot Reloadなどの開発機能を有効化
+ * 
+ * 3. SPAプロキシ
+ *    - React開発サーバーとの連携
+ *    - APIリクエストの自動転送
+ * 
+ * 4. ポート設定
+ *    - Kestrel: 61319（HTTP）
+ *    - IIS Express: 52855（HTTP）、44379（HTTPS）
+ * 
+ * 5. Swagger UI
+ *    - 起動時に自動でSwagger UIページを開く
+ *    - API仕様の確認とテストが可能
+ */

@@ -1,52 +1,61 @@
+/* メインレイアウトのコンテナ - 画面全体の構造を定義 */
 .layout-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100vh; /* ビューポート全体の高さを確保 */
 }
 
+/* メインコンテンツとサイドバーを含む横並びレイアウト */
 .main-container {
     display: flex;
-    flex: 1;
+    flex: 1; /* 親要素の残りスペースを全て使用 */
     height: 100vh;
 }
 
+/* サイドバーのスタイル定義 */
 .sidebar {
-    width: 280px;
-    background-color: #999999;
+    width: 280px; /* 固定幅のサイドバー */
+    background-color: #999999; /* グレー背景 */
     display: flex;
     flex-direction: column;
     padding: 20px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 画面が狭くなってもサイドバーは縮小しない */
 }
 
+/* サイドバーのヘッダー部分 */
 .sidebar-header {
     margin-bottom: 40px;
 }
 
+/* ユーザー情報表示セクション */
 .user-section {
     color: white;
     text-align: left;
 }
 
+/* 挨拶文のスタイル */
 .greeting {
     font-size: 1.2rem;
     margin: 0;
     margin-bottom: 10px;
 }
 
+/* サイドバーに表示するユーザー名 */
 .sidebar-user-name {
     font-size: 1.5rem;
     margin: 0;
     font-weight: 500;
 }
 
+/* ナビゲーションメニューのコンテナ */
 .nav-menu {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    flex: 1;
+    gap: 15px; /* ボタン間の間隔 */
+    flex: 1; /* 残りスペースを使用して、下部ボタンを押し下げ */
 }
 
+    /* ナビゲーションボタンの共通スタイル */
     .nav-menu button {
         padding: 25px;
         background-color: white;
@@ -55,57 +64,59 @@
         color: #333;
         font-size: 1.1rem;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s; /* ホバー効果のアニメーション */
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
+        /* ホバー時の浮き上がり効果 */
         .nav-menu button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        /* アクティブなページのボタンだけ紫色 */
+        /* アクティブなページのボタンだけ紫色にハイライト */
         .nav-menu button.active {
             background-color: #7367F0;
             color: white;
         }
 
-    /* 下部ボタングループ */
+    /* 下部ボタングループ（パスワード変更・ログアウト） */
     .nav-menu .bottom-buttons {
-        margin-top: auto;
+        margin-top: auto; /* 自動的に下部に配置 */
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    /* パスワード変更ボタン */
+    /* パスワード変更ボタン専用スタイル */
     .nav-menu .password-update-btn {
-        background-color: #3498db;
+        background-color: #3498db; /* 青色 */
         color: white;
     }
 
         .nav-menu .password-update-btn:hover {
-            background-color: #2980b9;
+            background-color: #2980b9; /* ホバー時は濃い青 */
             transform: translateY(-2px);
         }
 
-    /* ログアウトボタン */
+    /* ログアウトボタン専用スタイル */
     .nav-menu .logout-btn {
-        background-color: #EA5455;
+        background-color: #EA5455; /* 赤色 */
         color: white;
     }
 
         .nav-menu .logout-btn:hover {
-            background-color: #d63031;
+            background-color: #d63031; /* ホバー時は濃い赤 */
             transform: translateY(-2px);
         }
 
+/* メインコンテンツエリアのスタイル */
 .main-content {
-    flex: 1;
+    flex: 1; /* サイドバー以外の残りスペースを使用 */
     background-color: #f5f5f5;
     padding: 0;
-    overflow-y: auto;
+    overflow-y: auto; /* コンテンツが溢れた時はスクロール可能 */
     display: flex;
-    justify-content: center;
+    justify-content: center; /* 子要素を中央配置 */
     align-items: center;
 }

@@ -1,90 +1,105 @@
+/* CSSカスタムプロパティ（CSS変数）の定義 */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; /* システムフォントを優先 */
+    line-height: 1.5; /* 行間1.5倍 */
+    font-weight: 400; /* 通常の太さ */
+    color-scheme: light dark; /* ライト/ダークモード対応 */
+    color: rgba(255, 255, 255, 0.87); /* 薄い白文字（ダークモード用） */
+    background-color: #242424; /* ダーク背景 */
+    font-synthesis: none; /* フォント合成を無効化 */
+    text-rendering: optimizeLegibility; /* 読みやすさ最適化 */
+    -webkit-font-smoothing: antialiased; /* Webkit系のフォント滑らか表示 */
+    -moz-osx-font-smoothing: grayscale; /* Firefox macOSのフォント滑らか表示 */
 }
 
+/* リンクのスタイル */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+    font-weight: 500; /* 中太字 */
+    color: #646cff; /* 青紫色 */
+    text-decoration: inherit; /* 装飾を継承 */
 }
 
+    /* リンクのホバー効果 */
+    a:hover {
+        color: #535bf2; /* 少し薄い青紫色 */
+    }
+
+/* body要素の基本スタイル */
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    margin: 0; /* マージンをリセット */
+    display: flex; /* Flexboxレイアウト */
+    place-items: center; /* 中央配置（グリッド用） */
+    min-width: 320px; /* 最小幅320px（モバイル対応） */
+    min-height: 100vh; /* 最小高さはビューポート全体 */
 }
 
+/* h1見出しのスタイル */
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+    font-size: 3.2em; /* フォントサイズ3.2em */
+    line-height: 1.1; /* 行間1.1倍 */
 }
 
+/* ボタンの基本スタイル */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    border-radius: 8px; /* 角丸8px */
+    border: 1px solid transparent; /* 透明な境界線 */
+    padding: 0.6em 1.2em; /* 内側余白 */
+    font-size: 1em; /* フォントサイズ1em */
+    font-weight: 500; /* 中太字 */
+    font-family: inherit; /* フォントファミリーを継承 */
+    background-color: #1a1a1a; /* ダーク背景 */
+    cursor: pointer; /* ポインターカーソル */
+    transition: border-color 0.25s; /* 境界線色の変化を0.25秒でアニメーション */
 }
 
+    /* ボタンのホバー効果 */
+    button:hover {
+        border-color: #646cff; /* 青紫色の境界線 */
+    }
+
+    /* ボタンのフォーカス時 */
+    button:focus,
+    button:focus-visible {
+        outline: 4px auto -webkit-focus-ring-color; /* Webkit系のフォーカスリング */
+    }
+
+/* ライトモード対応（OSの設定に応じて） */
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    :root {
+        color: #213547; /* ダーク文字色 */
+        background-color: #ffffff; /* 白背景 */
+    }
+
+    a:hover {
+        color: #747bff; /* 薄い青紫色 */
+    }
+
+    button {
+        background-color: #f9f9f9; /* 薄いグレー背景 */
+    }
 }
 
-/* これを追加 */
+/* === 追加スタイル === */
+/* HTML/BODYのリセット（完全なリセット） */
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
+    margin: 0; /* マージンをゼロに */
+    padding: 0; /* パディングをゼロに */
+    height: 100%; /* 高さ100% */
+    width: 100%; /* 幅100% */
 }
 
+/* Reactのルート要素 */
 #root {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    height: 100%; /* 高さ100% */
+    width: 100%; /* 幅100% */
+    margin: 0; /* マージンをゼロに */
+    padding: 0; /* パディングをゼロに */
 }
 
+/* body要素の追加設定（重複しているが互換性のため） */
 body {
-    margin: 0;
-    display: flex;
-    min-width: 320px;
-    min-height: 100vh;
+    margin: 0; /* マージンをゼロに */
+    display: flex; /* Flexboxレイアウト */
+    min-width: 320px; /* 最小幅320px */
+    min-height: 100vh; /* 最小高さはビューポート全体 */
 }

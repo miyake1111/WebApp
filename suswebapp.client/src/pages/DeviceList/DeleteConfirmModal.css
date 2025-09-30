@@ -1,29 +1,34 @@
-﻿.delete-modal-content {
+﻿/* 削除確認モーダルのコンテンツボックス */
+.delete-modal-content {
     background: white;
     border-radius: 15px;
     padding: 40px;
     width: 400px;
-    text-align: center;
+    text-align: center; /* 中央寄せで警告感を演出 */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+    /* モーダルのタイトル */
     .delete-modal-content h2 {
         margin-bottom: 20px;
         color: #333;
     }
 
+    /* 削除対象の表示 */
     .delete-modal-content p {
         margin-bottom: 30px;
         color: #666;
         font-size: 16px;
     }
 
+/* ボタングループのレイアウト */
 .delete-modal-buttons {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 30px; /* ボタン間の間隔 */
 }
 
+/* 確認・キャンセルボタン共通スタイル */
 .confirm-btn, .cancel-btn {
     padding: 10px 40px;
     border: none;
@@ -33,11 +38,13 @@
     transition: background-color 0.3s;
 }
 
+/* 確認ボタン - 緑色で肯定的な行動を示す */
 .confirm-btn {
     background-color: #27ae60;
     color: white;
 }
 
+/* キャンセルボタン - 赤色で否定的な行動を示す */
 .cancel-btn {
     background-color: #e74c3c;
     color: white;

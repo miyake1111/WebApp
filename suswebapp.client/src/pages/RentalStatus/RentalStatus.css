@@ -1,405 +1,420 @@
 ﻿/* RentalStatus.css - UserListデザイン統一版 */
 
+/* メインコンテナ - 貸出状況画面全体 */
 .rental-status-container {
-    padding: 30px;
-    height: 100vh;
-    background-color: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
+    padding: 30px; /* 内側余白30px */
+    height: 100vh; /* ビューポート全体の高さ */
+    background-color: #f5f5f5; /* 薄いグレー背景 */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    box-sizing: border-box; /* paddingを幅・高さに含める */
 }
 
+/* ヘッダー部分（タイトルと戻るボタン） */
 .rental-status-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-shrink: 0;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: space-between; /* 左右に分散配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    margin-bottom: 20px; /* 下方向余白20px */
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
+    /* ページタイトル */
     .rental-status-header h2 {
-        font-size: 28px;
-        color: #333;
-        margin: 0;
+        font-size: 28px; /* フォントサイズ28px */
+        color: #333; /* ダークグレー文字 */
+        margin: 0; /* デフォルトマージンを削除 */
     }
 
+/* メニューに戻るボタン */
 .back-btn {
-    padding: 10px 20px;
-    background-color: #95a5a6;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
+    padding: 10px 20px; /* 内側余白 */
+    background-color: #95a5a6; /* グレー背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 6px; /* 角丸6px */
+    font-size: 16px; /* フォントサイズ16px */
+    cursor: pointer; /* ポインターカーソル */
 }
 
     .back-btn:hover {
-        background-color: #7f8c8d;
+        background-color: #7f8c8d; /* ホバー時は濃いグレー */
     }
 
-/* コントロール全体のコンテナ */
+/* コントロール全体のコンテナ（フィルターと検索） */
 .controls-container {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 0px;
-    padding: 0 20px;
-    flex-shrink: 0;
+    display: flex; /* Flexboxレイアウト */
+    align-items: flex-end; /* 下端揃え */
+    justify-content: space-between; /* 左右に分散配置 */
+    gap: 10px; /* 項目間の間隔10px */
+    margin-bottom: 0px; /* 下方向余白なし */
+    padding: 0 20px; /* 左右パディング20px */
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
-/* 左側グループ（フィルター） */
+/* 左側グループ（フィルターボタン） */
 .filter-buttons-group {
-    display: flex;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    gap: 10px; /* ボタン間の間隔10px */
 }
 
 /* 右側グループ（検索関連） */
 .search-group {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    align-items: flex-end; /* 下端揃え */
+    gap: 10px; /* 項目間の間隔10px */
 }
 
 /* 検索と履歴ボタンを縦に配置 */
 .search-history-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    gap: 4px; /* ボタン間の間隔4px */
 }
 
-/* フィルターボタン */
+/* フィルターボタン（すべて、空き、貸出中、期限超過） */
 .filter-btn {
-    padding: 6px 16px;
-    height: 36px;
-    border: 2px solid #ddd;
-    background-color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    color: #333;
+    padding: 6px 16px; /* 内側余白 */
+    height: 36px; /* 固定高さ36px */
+    border: 2px solid #ddd; /* グレー境界線 */
+    background-color: white; /* 白背景 */
+    border-radius: 6px; /* 角丸6px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 14px; /* フォントサイズ14px */
+    transition: all 0.3s ease; /* すべてのプロパティを0.3秒でアニメーション */
+    color: #333; /* ダークグレー文字 */
 }
 
     .filter-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transform: scale(1.05); /* 1.05倍に拡大 */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* 影を追加 */
     }
 
+    /* アクティブなフィルターボタン */
     .filter-btn.active {
-        background-color: #3498db;
-        color: white;
-        border-color: #3498db;
+        background-color: #3498db; /* 青背景 */
+        color: white; /* 白文字 */
+        border-color: #3498db; /* 青境界線 */
     }
 
-/* 検索関連ボタン */
+/* 検索関連ボタン（クリア、検索、履歴） */
 .clear-search-btn,
 .search-btn,
 .history-btn {
-    width: 36px;
-    height: 36px;
-    border: 2px solid #ddd;
-    background-color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    transition: all 0.2s ease;
-    color: #000000;
+    width: 36px; /* 固定幅36px */
+    height: 36px; /* 固定高さ36px */
+    border: 2px solid #ddd; /* グレー境界線 */
+    background-color: white; /* 白背景 */
+    border-radius: 6px; /* 角丸6px */
+    cursor: pointer; /* ポインターカーソル */
+    display: flex; /* Flexboxレイアウト */
+    align-items: center; /* 垂直方向中央配置 */
+    justify-content: center; /* 水平方向中央配置 */
+    font-size: 18px; /* フォントサイズ18px */
+    transition: all 0.2s ease; /* すべてのプロパティを0.2秒でアニメーション */
+    color: #000000; /* 黒文字 */
 }
 
     .clear-search-btn:hover,
     .search-btn:hover,
     .history-btn:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.05);
+        background-color: #f8f9fa; /* ホバー時は薄いグレー背景 */
+        transform: scale(1.05); /* 1.05倍に拡大 */
     }
 
-/* 検索入力 */
+/* 検索入力フィールド */
 .search-input {
-    width: 300px;
-    padding: 6px 12px;
-    height: 30px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
+    width: 300px; /* 固定幅300px */
+    padding: 6px 12px; /* 内側余白 */
+    height: 30px; /* 固定高さ30px */
+    border: 2px solid #ddd; /* グレー境界線 */
+    border-radius: 6px; /* 角丸6px */
+    font-size: 14px; /* フォントサイズ14px */
+    box-sizing: border-box; /* paddingとborderを幅に含める */
 }
 
     .search-input:focus {
-        outline: none;
-        border-color: #3498db;
+        outline: none; /* デフォルトアウトラインを削除 */
+        border-color: #3498db; /* フォーカス時は青境界線 */
     }
 
 /* テーブルコンテナ全体 */
 .rental-table-container {
-    flex: 1;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-    margin-top: 20px;
+    flex: 1; /* 残りスペースを使用 */
+    background-color: white; /* 白背景 */
+    border-radius: 8px; /* 角丸8px */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 影で立体感 */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    min-height: 0; /* flexアイテムの縮小を許可 */
+    overflow: hidden; /* はみ出し部分を隠す */
+    margin-top: 20px; /* 上方向余白20px */
 }
 
 /* テーブルラッパー - スクロール設定を修正 */
 .rental-table-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: auto;
-    padding: 0;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
+    flex: 1; /* 残りスペースを使用 */
+    overflow-y: auto; /* 縦スクロール可能 */
+    overflow-x: auto; /* 横スクロール可能 */
+    padding: 0; /* パディングなし */
+    background: transparent; /* 透明背景 */
+    box-shadow: none; /* 影なし */
+    border-radius: 0; /* 角丸なし */
     max-height: calc(100vh - 300px); /* 高さを制限してスクロールを有効化 */
 }
 
-/* テーブル */
+/* 貸出テーブル本体 */
 .rental-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1200px;
+    width: 100%; /* 幅100% */
+    border-collapse: collapse; /* セル間の隙間を削除 */
+    min-width: 1200px; /* 最小幅1200px */
 }
 
+    /* テーブルヘッダー全体 */
     .rental-table thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        position: sticky; /* スクロール時に固定 */
+        top: 0; /* 上端に固定 */
+        z-index: 10; /* 前面に表示 */
     }
 
+    /* テーブルヘッダーセル */
     .rental-table th {
-        background-color: #34495e;
-        color: white;
-        padding: 12px;
-        text-align: left;
-        font-weight: 500;
-        position: sticky;
-        top: 0;
+        background-color: #34495e; /* ダークグレー背景 */
+        color: white; /* 白文字 */
+        padding: 12px; /* 内側余白12px */
+        text-align: left; /* 左寄せ */
+        font-weight: 500; /* 中太字 */
+        position: sticky; /* スクロール時に固定 */
+        top: 0; /* 上端に固定 */
     }
 
+    /* テーブルデータセル */
     .rental-table td {
-        padding: 12px;
-        border-bottom: 1px solid #ecf0f1;
-        color: #2c3e50;
+        padding: 12px; /* 内側余白12px */
+        border-bottom: 1px solid #ecf0f1; /* 薄いグレーの下線 */
+        color: #2c3e50; /* ダークグレー文字 */
     }
 
+    /* テーブル行のホバー効果 */
     .rental-table tbody tr:hover {
-        background-color: #f8f9fa;
+        background-color: #f8f9fa; /* 薄いグレー背景 */
     }
 
-/* 資産番号リンク */
+/* 資産番号リンクボタン */
 .asset-link {
-    color: #3498db;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: 500;
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: inherit;
-    transition: color 0.2s ease;
+    color: #3498db; /* 青色文字 */
+    cursor: pointer; /* ポインターカーソル */
+    text-decoration: none; /* 下線なし */
+    font-weight: 500; /* 中太字 */
+    background: none; /* 背景なし */
+    border: none; /* 境界線なし */
+    padding: 0; /* パディングなし */
+    font-size: inherit; /* フォントサイズ継承 */
+    transition: color 0.2s ease; /* 色の変化を0.2秒でアニメーション */
 }
 
     .asset-link:hover {
-        color: #2980b9;
-        text-decoration: underline;
+        color: #2980b9; /* ホバー時は濃い青 */
+        text-decoration: underline; /* 下線を表示 */
     }
 
-/* ステータスセル */
+/* ステータスセル（空き状態表示） */
 .status-cell {
-    text-align: center;
+    text-align: center; /* 中央寄せ */
 }
 
+/* 空き状態の表示 */
 .status-available {
-    color: #27ae60;
-    font-weight: bold;
-    font-size: 1.2rem;
+    color: #27ae60; /* 緑色 */
+    font-weight: bold; /* 太字 */
+    font-size: 1.2rem; /* フォントサイズ1.2rem */
 }
 
+/* 貸出中の表示 */
 .status-rented {
-    color: #e74c3c;
-    font-weight: bold;
+    color: #e74c3c; /* 赤色 */
+    font-weight: bold; /* 太字 */
 }
 
 /* アクションセル */
 .action-cell {
-    text-align: center;
+    text-align: center; /* 中央寄せ */
 }
 
+/* 履歴ボタン */
 .btn-history {
-    padding: 6px 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s;
+    padding: 6px 12px; /* 内側余白 */
+    background-color: #6c757d; /* グレー背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 4px; /* 角丸4px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 0.85rem; /* フォントサイズ0.85rem */
+    transition: all 0.2s; /* すべてのプロパティを0.2秒でアニメーション */
 }
 
     .btn-history:hover {
-        background-color: #5a6268;
-        transform: translateY(-1px);
+        background-color: #5a6268; /* ホバー時は濃いグレー */
+        transform: translateY(-1px); /* 1px上に移動 */
     }
 
-/* 期限超過の行 */
+/* 期限超過の行のスタイル */
 .overdue-row {
-    background-color: #ffe5e5;
+    background-color: #ffe5e5; /* 薄い赤背景 */
 }
 
-/* 故障機器の行 */
+/* 故障機器の行のスタイル */
 .broken-row {
-    background-color: #a9a9a9;
-    opacity: 0.8;
+    background-color: #a9a9a9; /* グレー背景 */
+    opacity: 0.8; /* 透明度80% */
 }
 
-/* 危険テキスト */
+/* 危険テキスト（期限超過など） */
 .text-danger {
-    color: #e74c3c;
-    font-weight: bold;
+    color: #e74c3c; /* 赤色 */
+    font-weight: bold; /* 太字 */
 }
 
-/* データなし */
+/* データなし表示 */
 .no-data {
-    text-align: center;
-    color: #6c757d;
-    padding: 50px !important;
+    text-align: center; /* 中央寄せ */
+    color: #6c757d; /* グレー文字 */
+    padding: 50px !important; /* 内側余白50px（優先） */
 }
 
-/* テーブルフッター */
+/* テーブルフッター（件数表示） */
 .table-footer {
-    padding: 15px 20px;
-    background-color: #f8f9fa;
-    border-top: 2px solid #dee2e6;
-    border-radius: 0 0 8px 8px;
-    flex-shrink: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    padding: 15px 20px; /* 内側余白 */
+    background-color: #f8f9fa; /* 薄いグレー背景 */
+    border-top: 2px solid #dee2e6; /* グレー上線 */
+    border-radius: 0 0 8px 8px; /* 下部のみ角丸 */
+    flex-shrink: 0; /* 縮小を防ぐ */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: flex-start; /* 左寄せ */
+    align-items: center; /* 垂直方向中央配置 */
 }
 
+/* 件数表示テキスト */
 .record-count {
-    font-size: 14px;
-    color: #6c757d;
-    font-weight: 500;
+    font-size: 14px; /* フォントサイズ14px */
+    color: #6c757d; /* グレー文字 */
+    font-weight: 500; /* 中太字 */
 }
 
 /* 検索ハイライト */
 .highlight {
-    background-color: #fff3cd;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-weight: 600;
+    background-color: #fff3cd; /* 黄色背景 */
+    padding: 2px 4px; /* 内側余白 */
+    border-radius: 3px; /* 角丸3px */
+    font-weight: 600; /* セミボールド */
 }
 
-/* スクロールバーのスタイル - 常に表示 */
+/* スクロールバーのスタイル - Webkit系ブラウザ - 常に表示 */
 .rental-table-wrapper::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 10px; /* スクロールバー幅10px */
+    height: 10px; /* スクロールバー高さ10px */
 }
 
 .rental-table-wrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+    background: #f1f1f1; /* トラック背景色 */
+    border-radius: 10px; /* 角丸10px */
 }
 
 .rental-table-wrapper::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
+    background: #888; /* つまみの色 */
+    border-radius: 10px; /* 角丸10px */
 }
 
     .rental-table-wrapper::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: #555; /* ホバー時は濃いグレー */
     }
 
-/* スクロールバーを常に表示（Windows） */
+/* スクロールバーを常に表示（Firefox） */
 .rental-table-wrapper {
-    scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
+    scrollbar-width: thin; /* 細いスクロールバー */
+    scrollbar-color: #888 #f1f1f1; /* つまみとトラックの色 */
 }
 
-/* ローディング */
+/* ローディング表示 */
 .loading {
-    text-align: center;
-    padding: 50px;
-    font-size: 18px;
-    color: #7f8c8d;
+    text-align: center; /* 中央寄せ */
+    padding: 50px; /* 内側余白50px */
+    font-size: 18px; /* フォントサイズ18px */
+    color: #7f8c8d; /* グレー文字 */
 }
 
 /* モーダルオーバーレイ */
 .modal-overlay {
-    position: fixed;
+    position: fixed; /* ビューポートに対して固定配置 */
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    bottom: 0; /* 画面全体を覆う */
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 水平方向中央配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    z-index: 1000; /* 最前面に表示 */
 }
 
-/* レスポンシブ対応 */
+/* レスポンシブ対応 - 低高さ画面（600px以下） */
 @media (max-height: 600px) {
     .rental-status-container {
-        padding: 15px;
+        padding: 15px; /* パディングを縮小 */
     }
 
     .rental-status-header {
-        margin-bottom: 10px;
+        margin-bottom: 10px; /* 下方向余白を縮小 */
     }
 
     .rental-table-wrapper {
-        max-height: calc(100vh - 250px);
+        max-height: calc(100vh - 250px); /* 高さを調整 */
     }
 }
 
+/* レスポンシブ対応 - 狭い画面（1200px以下） */
 @media (max-width: 1200px) {
     .rental-table-wrapper {
-        max-width: calc(100vw - 40px);
+        max-width: calc(100vw - 40px); /* 幅を調整 */
     }
 }
 
 /* 詳細ビュー時のスタイル */
 .rental-table-wrapper.detail-view {
-    overflow-x: auto;
+    overflow-x: auto; /* 横スクロール可能 */
 }
 
     .rental-table-wrapper.detail-view .rental-table {
-        min-width: 1400px;
+        min-width: 1400px; /* 詳細表示時の最小幅 */
     }
 
 /* 詳細ボタンコンテナ */
 .detail-button-container {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 20px;
-    flex-shrink: 0;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: flex-end; /* 右寄せ */
+    padding: 10px 20px; /* 内側余白 */
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
+/* 詳細表示切替ボタン */
 .detail-toggle-btn {
-    width: 40px;
-    height: 30px;
-    border: 1px solid #ddd;
-    background-color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 20px;
-    letter-spacing: 2px;
-    transition: all 0.2s ease;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 15px;
+    width: 40px; /* 固定幅40px */
+    height: 30px; /* 固定高さ30px */
+    border: 1px solid #ddd; /* グレー境界線 */
+    background-color: white; /* 白背景 */
+    border-radius: 6px; /* 角丸6px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 20px; /* フォントサイズ20px */
+    letter-spacing: 2px; /* 文字間隔2px（3点を離す） */
+    transition: all 0.2s ease; /* すべてのプロパティを0.2秒でアニメーション */
+    color: #333; /* ダークグレー文字 */
+    display: flex; /* Flexboxレイアウト */
+    align-items: center; /* 垂直方向中央配置 */
+    justify-content: center; /* 水平方向中央配置 */
+    padding-bottom: 15px; /* 下パディング15px（位置調整） */
 }
 
     .detail-toggle-btn:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.1);
+        background-color: #f8f9fa; /* ホバー時は薄いグレー背景 */
+        transform: scale(1.1); /* 1.1倍に拡大 */
     }

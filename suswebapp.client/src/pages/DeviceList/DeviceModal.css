@@ -1,46 +1,53 @@
-﻿.modal-overlay {
+﻿/* モーダルオーバーレイ（背景の暗幕） */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1000; /* 最前面に表示 */
 }
 
+/* モーダルコンテンツ本体 */
 .modal-content {
     background: white;
     border-radius: 15px;
     padding: 30px;
     width: 90%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-width: 800px; /* 最大幅を制限 */
+    max-height: 80vh; /* ビューポートの80%まで */
+    overflow-y: auto; /* 内容が溢れたらスクロール */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+    /* モーダルタイトル */
     .modal-content h2 {
         margin-bottom: 20px;
         color: #333;
         font-size: 24px;
     }
 
+/* フォームコンテナ（左右2列レイアウト） */
 .form-container {
     display: flex;
-    gap: 30px;
+    gap: 30px; /* 列間の間隔 */
 }
 
+/* フォーム左側・右側の列 */
 .form-left, .form-right {
-    flex: 1;
+    flex: 1; /* 均等幅 */
 }
 
+/* フォームグループ（各入力項目） */
 .form-group {
     margin-bottom: 15px;
 }
 
+    /* ラベル */
     .form-group label {
         display: block;
         margin-bottom: 5px;
@@ -48,6 +55,7 @@
         font-weight: 500;
     }
 
+    /* テキスト入力、数値入力、日付入力、テキストエリア */
     .form-group input[type="text"],
     .form-group input[type="number"],
     .form-group input[type="date"],
@@ -59,25 +67,29 @@
         font-size: 14px;
     }
 
+    /* チェックボックス */
     .form-group input[type="checkbox"] {
         width: 20px;
         height: 20px;
         cursor: pointer;
     }
 
+    /* テキストエリアのリサイズ方向 */
     .form-group textarea {
-        resize: vertical;
+        resize: vertical; /* 縦方向のみリサイズ可能 */
     }
 
+/* 横並びフォームグループ（日付入力用） */
 .form-group-row {
     display: flex;
     gap: 15px;
 }
 
     .form-group-row .form-group {
-        flex: 1;
+        flex: 1; /* 均等幅 */
     }
 
+/* モーダルボタングループ */
 .modal-buttons {
     display: flex;
     justify-content: center;
@@ -85,6 +97,7 @@
     margin-top: 30px;
 }
 
+/* 保存・キャンセルボタン共通スタイル */
 .save-btn, .cancel-btn {
     padding: 10px 40px;
     border: none;
@@ -94,6 +107,7 @@
     transition: background-color 0.3s;
 }
 
+/* 保存ボタン - 緑 */
 .save-btn {
     background-color: #27ae60;
     color: white;
@@ -103,6 +117,7 @@
         background-color: #229954;
     }
 
+/* キャンセルボタン - 赤 */
 .cancel-btn {
     background-color: #e74c3c;
     color: white;
@@ -112,31 +127,33 @@
         background-color: #c0392b;
     }
 
-/* 既存のコードの最後に以下を追加 */
-
+/* エラーテキスト表示 */
 .error-text {
-    color: #dc3545;
+    color: #dc3545; /* 赤色でエラーを示す */
     font-size: 12px;
     margin-top: 4px;
     display: block;
 }
 
+/* 重複チェック中表示 */
 .checking-text {
-    color: #007bff;
+    color: #007bff; /* 青色で処理中を示す */
     font-size: 12px;
     margin-top: 4px;
     display: block;
 }
 
+/* エラー状態の入力フィールド */
 .form-group input.error {
-    border-color: #dc3545;
+    border-color: #dc3545; /* 赤枠でエラーを示す */
 }
 
+/* 無効な入力フィールド */
 .form-group input:invalid {
     border-color: #dc3545;
 }
 
-/* 必須項目のラベル */
+/* 必須項目のラベル（未使用だがCSS定義済み） */
 .form-group label:has(+ input:required)::after {
     content: " *";
     color: #dc3545;
@@ -144,16 +161,16 @@
 
 /* 警告メッセージ（リース期限日用） */
 .error-text:has-text("⚠️") {
-    color: #ffc107;
+    color: #ffc107; /* 黄色で警告を示す */
 }
 
 /* 保存ボタンの無効化状態 */
 .save-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background-color: #95a5a6;
+    background-color: #95a5a6; /* グレー表示 */
 }
 
     .save-btn:disabled:hover {
-        background-color: #95a5a6;
+        background-color: #95a5a6; /* ホバー時も変化なし */
     }

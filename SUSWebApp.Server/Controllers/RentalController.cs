@@ -7,17 +7,29 @@ using System.Linq;
 
 namespace SUSWebApp.Server.Controllers
 {
+    /// <summary>
+    /// 貸出管理APIコントローラー
+    /// 機器の貸出・返却処理と履歴管理を提供
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")]  // URLパス: /api/rental
     public class RentalController : ControllerBase
     {
+        // データベース接続文字列
         private readonly string _connectionString;
 
+        /// <summary>
+        /// コンストラクタ - 依存性注入で設定を受け取る
+        /// </summary>
         public RentalController(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        /// <summary>
+        /// 機器貸出処理
+        /// POST: /api/rental/rent
+        /// </summary>
         [HttpPost("rent")]
         public IActionResult RentDevice([FromBody] RentalRequest request)
         {
@@ -26,11 +38,12 @@ namespace SUSWebApp.Server.Controllers
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
 
+                // トランザクション開始（貸出処理の整合性を保証）
                 using var transaction = connection.BeginTransaction();
 
                 try
                 {
-                    // まず機器が貸出可能か確認
+                    // ===== STEP 1: 機器が貸出可能か確認 =====
                     var checkAvailabilityQuery = @"
                 SELECT available_flag 
                 FROM ""TRN_RENTAL""
@@ -53,14 +66,14 @@ namespace SUSWebApp.Server.Controllers
                         return BadRequest(new { success = false, message = "この機器は貸出できません" });
                     }
 
-                    // TRN_RENTALの更新（正しい日付形式で）
+                    // ===== STEP 2: TRN_RENTALテーブルを更新 =====
                     var updateQuery = @"
                 UPDATE ""TRN_RENTAL""
                 SET employee_no = @EmployeeNo,
-                    rental_date = CURRENT_DATE,
-                    due_date = @DueDate::date,
-                    return_date = NULL,
-                    available_flag = FALSE
+                    rental_date = CURRENT_DATE,        -- 貸出日は今日
+                    due_date = @DueDate::date,         -- 返却予定日
+                    return_date = NULL,                -- 返却日はクリア
+                    available_flag = FALSE              -- 貸出中フラグ
                 WHERE asset_no = @AssetNo 
                 AND available_flag = TRUE";
 
@@ -95,6 +108,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// 機器返却処理
+        /// POST: /api/rental/return
+        /// </summary>
         [HttpPost("return")]
         public IActionResult ReturnDevice([FromBody] ReturnRequest request)
         {
@@ -107,7 +124,7 @@ namespace SUSWebApp.Server.Controllers
 
                 try
                 {
-                    // 現在の貸出情報を取得
+                    // ===== STEP 1: 現在の貸出情報を取得 =====
                     string employeeNo = null;
                     string employeeName = null;
                     DateTime? rentalDate = null;
@@ -118,8 +135,8 @@ namespace SUSWebApp.Server.Controllers
                 FROM ""TRN_RENTAL"" r
                 LEFT JOIN ""MST_USER"" u ON r.employee_no = u.employee_no
                 WHERE r.asset_no = @AssetNo 
-                AND r.available_flag = FALSE
-                AND r.return_date IS NULL";
+                AND r.available_flag = FALSE      -- 貸出中
+                AND r.return_date IS NULL"; //未返却
 
                     using (var cmd = new NpgsqlCommand(getCurrentRentalQuery, connection, transaction))
                     {
@@ -138,11 +155,11 @@ namespace SUSWebApp.Server.Controllers
                         }
                     }
 
-                    // TRN_RENTALの更新（空きフラグと返却日のみ更新）
+                    // ===== STEP 2: TRN_RENTALを更新（返却処理） =====
                     var updateQuery = @"
                 UPDATE ""TRN_RENTAL""
-                SET available_flag = TRUE,
-                    return_date = CURRENT_DATE
+                SET available_flag = TRUE,         -- 貸出可能にする
+                    return_date = CURRENT_DATE     -- 返却日を今日に設定
                 WHERE asset_no = @AssetNo 
                 AND available_flag = FALSE
                 AND return_date IS NULL";
@@ -159,7 +176,7 @@ namespace SUSWebApp.Server.Controllers
                         }
                     }
 
-                    // HST_RENTAL_CHANGEに返却履歴を記録（カラム名を小文字に）
+                    // ===== STEP 3: 履歴テーブルに記録 =====
                     var changeHistoryQuery = @"
                 INSERT INTO ""HST_RENTAL_CHANGE"" 
                 (change_date, change_type, asset_no, employee_no_before, employee_no_after, 
@@ -183,6 +200,7 @@ namespace SUSWebApp.Server.Controllers
 
                     transaction.Commit();
 
+                    // 返却完了情報を返す
                     return Ok(new
                     {
                         success = true,
@@ -209,6 +227,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// 貸出状況一覧取得
+        /// GET: /api/rental/status
+        /// </summary>
         [HttpGet("status")]
         public IActionResult GetRentalStatus()
         {
@@ -217,6 +239,7 @@ namespace SUSWebApp.Server.Controllers
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
 
+                // 貸出状況を取得する複雑なクエリ
                 var query = @"
             SELECT 
                 r.rental_id,
@@ -238,6 +261,7 @@ namespace SUSWebApp.Server.Controllers
                 TO_CHAR(r.inventory_date, 'YYYY-MM-DD HH24:MI:SS') as inventoryDate,
                 r.remarks as rentalRemarks,
                 d.remarks as deviceRemarks,
+                -- 延滞フラグの計算
                 CASE 
                     WHEN r.available_flag = FALSE AND r.due_date < CURRENT_DATE 
                     THEN true 
@@ -277,7 +301,7 @@ namespace SUSWebApp.Server.Controllers
                             inventoryDate = reader["inventoryDate"]?.ToString(),
                             rentalRemarks = reader["rentalRemarks"]?.ToString(),
                             deviceRemarks = reader["deviceRemarks"]?.ToString(),
-                            isOverdue = Convert.ToBoolean(reader["isOverdue"])
+                            isOverdue = Convert.ToBoolean(reader["isOverdue"])  // 延滞フラグ
                         });
                     }
                 }
@@ -290,7 +314,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 特定ユーザーの貸出情報を取得（単一）
+        /// <summary>
+        /// 特定ユーザーの貸出情報を取得（単一）
+        /// GET: /api/rental/user/{employeeNo}
+        /// </summary>
         [HttpGet("user/{employeeNo}")]
         public IActionResult GetUserRentalInfo(string employeeNo)
         {
@@ -308,9 +335,9 @@ namespace SUSWebApp.Server.Controllers
                 r.return_date as returnDate
             FROM ""TRN_RENTAL"" r
             WHERE r.employee_no = @EmployeeNo
-            AND r.available_flag = FALSE
-            AND r.return_date IS NULL
-            LIMIT 1";
+            AND r.available_flag = FALSE    -- 貸出中
+            AND r.return_date IS NULL        -- 未返却
+            LIMIT 1"; //1件のみ取得
 
                 using var cmd = new NpgsqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@EmployeeNo", employeeNo);
@@ -333,7 +360,7 @@ namespace SUSWebApp.Server.Controllers
                     return Ok(new { rental = rental });
                 }
 
-                return Ok(new { rental = (object)null });
+                return Ok(new { rental = (object)null });  // 貸出なし
             }
             catch (Exception ex)
             {
@@ -341,7 +368,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 特定ユーザーの貸出情報を取得（複数）
+        /// <summary>
+        /// 特定ユーザーの貸出情報を取得（複数）
+        /// GET: /api/rental/user/{employeeNo}/all
+        /// </summary>
         [HttpGet("user/{employeeNo}/all")]
         public IActionResult GetUserRentalsAll(string employeeNo)
         {
@@ -360,7 +390,7 @@ namespace SUSWebApp.Server.Controllers
             WHERE r.employee_no = @EmployeeNo
             AND r.available_flag = FALSE
             AND r.return_date IS NULL
-            ORDER BY r.rental_date DESC";
+            ORDER BY r.rental_date DESC";    // 新しい順
 
                 var rentals = new List<object>();
                 using var cmd = new NpgsqlCommand(query, connection);
@@ -390,7 +420,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 返却処理（IDベース）
+        /// <summary>
+        /// 返却処理（IDベース）
+        /// POST: /api/rental/return/{rentalId}
+        /// </summary>
         [HttpPost("return/{rentalId}")]
         public IActionResult ReturnDeviceById(int rentalId)
         {
@@ -403,7 +436,7 @@ namespace SUSWebApp.Server.Controllers
 
                 try
                 {
-                    // まず該当レコードの情報を取得
+                    // ===== STEP 1: 該当レコードの情報を取得 =====
                     var getInfoQuery = @"
                 SELECT asset_no, employee_no, rental_date, due_date
                 FROM ""TRN_RENTAL""
@@ -433,7 +466,7 @@ namespace SUSWebApp.Server.Controllers
                         }
                     }
 
-                    // 返却処理
+                    // ===== STEP 2: 返却処理 =====
                     var updateQuery = @"
                 UPDATE ""TRN_RENTAL""
                 SET available_flag = TRUE,
@@ -452,7 +485,7 @@ namespace SUSWebApp.Server.Controllers
                         }
                     }
 
-                    // HST_RENTAL_CHANGEに記録
+                    // ===== STEP 3: 履歴に記録 =====
                     var changeHistoryQuery = @"
                 INSERT INTO ""HST_RENTAL_CHANGE"" 
                 (change_date, change_type, asset_no, employee_no_before, employee_no_after, 
@@ -488,6 +521,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// 全貸出履歴取得
+        /// GET: /api/rental/history
+        /// </summary>
         [HttpGet("history")]
         public IActionResult GetAllRentalHistory()
         {
@@ -540,7 +577,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 特定資産の履歴取得
+        /// <summary>
+        /// 特定資産の履歴取得
+        /// GET: /api/rental/history/{assetNo}
+        /// </summary>
         [HttpGet("history/{assetNo}")]
         public IActionResult GetAssetRentalHistory(string assetNo)
         {
@@ -592,19 +632,26 @@ namespace SUSWebApp.Server.Controllers
         }
     }
 
-    // リクエストクラスの定義
+    // ===== リクエストクラスの定義 =====
+
+    /// <summary>
+    /// 貸出リクエストモデル
+    /// </summary>
     public class RentalRequest
     {
-        public string AssetNo { get; set; }
-        public string EmployeeNo { get; set; }
-        public DateTime? RentalDate { get; set; }
-        public DateTime DueDate { get; set; }
+        public string AssetNo { get; set; }        // 資産番号
+        public string EmployeeNo { get; set; }     // 社員番号
+        public DateTime? RentalDate { get; set; }  // 貸出日（通常は自動設定）
+        public DateTime DueDate { get; set; }      // 返却予定日
     }
 
+    /// <summary>
+    /// 返却リクエストモデル
+    /// </summary>
     public class ReturnRequest
     {
-        public string AssetNo { get; set; }
-        public string EmployeeNo { get; set; }  // 現在のユーザーの社員番号
-        public DateTime? ReturnDate { get; set; }
+        public string AssetNo { get; set; }       // 資産番号
+        public string EmployeeNo { get; set; }    // 現在のユーザーの社員番号
+        public DateTime? ReturnDate { get; set; } // 返却日（通常は自動設定）
     }
 }

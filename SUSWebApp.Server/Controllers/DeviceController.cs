@@ -6,25 +6,36 @@ using SUSWebApp.Server.Models.Entities;
 
 namespace SUSWebApp.Server.Controllers
 {
+    /// <summary>
+    /// デバイス管理APIコントローラー
+    /// 機器の CRUD 操作と履歴管理を提供
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")]  // URLパス: /api/device
     public class DeviceController : ControllerBase
     {
+        // Entity Framework Coreのデータベースコンテキスト
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// コンストラクタ - 依存性注入でDBコンテキストを受け取る
+        /// </summary>
         public DeviceController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // 全デバイス取得（貸出状況含む）
+        /// <summary>
+        /// 全デバイス取得（貸出状況含む）
+        /// GET: /api/device
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetDevices()
         {
             try
             {
                 var devices = await _context.MstDevices
-                    .Where(d => !d.IsDeleted)
+                    .Where(d => !d.IsDeleted)  // 削除されていないデバイスのみ
                     .Select(d => new
                     {
                         d.AssetNo,
@@ -36,6 +47,7 @@ namespace SUSWebApp.Server.Controllers
                         d.StorageLocation,
                         d.IsBroken,
                         d.Remarks,
+                        // 貸出情報を結合
                         RentalInfo = _context.TrnRentals
                             .Where(r => r.AssetNo == d.AssetNo)
                             .Select(r => new
@@ -44,6 +56,7 @@ namespace SUSWebApp.Server.Controllers
                                 r.EmployeeNo,
                                 r.RentalDate,
                                 r.DueDate,
+                                // ユーザー名を結合
                                 UserName = r.EmployeeNo != null ?
                                     _context.MstUsers
                                         .Where(u => u.EmployeeNo == r.EmployeeNo)
@@ -66,7 +79,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 特定デバイス詳細取得
+        /// <summary>
+        /// 特定デバイス詳細取得
+        /// GET: /api/device/{assetNo}
+        /// </summary>
         [HttpGet("{assetNo}")]
         public async Task<IActionResult> GetDevice(string assetNo)
         {
@@ -81,10 +97,12 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "デバイスが見つかりません" });
                 }
 
+                // 貸出情報を取得
                 var rental = await _context.TrnRentals
                     .Where(r => r.AssetNo == assetNo)
                     .FirstOrDefaultAsync();
 
+                // レスポンス用オブジェクトを構成
                 var result = new
                 {
                     Device = device,
@@ -108,17 +126,21 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // 利用可能デバイス一覧
+        /// <summary>
+        /// 利用可能デバイス一覧
+        /// GET: /api/device/available
+        /// 故障していない＆貸出可能なデバイスのみ
+        /// </summary>
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableDevices()
         {
             try
             {
                 var availableDevices = await _context.MstDevices
-                    .Where(d => !d.IsDeleted && !d.IsBroken)
+                    .Where(d => !d.IsDeleted && !d.IsBroken)  // 削除されておらず、故障していない
                     .Where(d => _context.TrnRentals
                         .Where(r => r.AssetNo == d.AssetNo)
-                        .All(r => r.AvailableFlag == true))
+                        .All(r => r.AvailableFlag == true))  // 貸出可能フラグがtrue
                     .Select(d => new
                     {
                         d.AssetNo,
@@ -142,6 +164,11 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// デバイスリスト取得（一覧画面用）
+        /// GET: /api/device/list
+        /// 資産番号でソート済み
+        /// </summary>
         [HttpGet("list")]
         public async Task<IActionResult> GetDeviceList()
         {
@@ -150,14 +177,15 @@ namespace SUSWebApp.Server.Controllers
                 var devices = await _context.MstDevices
                     .Where(d => !d.IsDeleted)
                     .ToListAsync();
+
                 // メモリ上で資産番号を解析してソート
                 var sortedDevices = devices
                     .OrderBy(d => {
-                        // 資産番号を分解して並び替え
+                        // 資産番号を分解して並び替え（例：A19-06-001）
                         var parts = d.AssetNo.Split('-');
                         if (parts.Length >= 3)
                         {
-                            // A19-06-001 のような形式を想定
+                            // パディングを追加して文字列比較を正しく行う
                             return $"{parts[0]}-{parts[1].PadLeft(2, '0')}-{parts[2].PadLeft(3, '0')}";
                         }
                         return d.AssetNo;
@@ -179,7 +207,7 @@ namespace SUSWebApp.Server.Controllers
                 return Ok(new
                 {
                     success = true,
-                    data = devices
+                    data = sortedDevices  // 修正: sortedDevicesを返す
                 });
             }
             catch (Exception ex)
@@ -193,8 +221,10 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // デバイス削除（論理削除）
-        // デバイス削除メソッドも修正
+        /// <summary>
+        /// デバイス削除（論理削除）
+        /// DELETE: /api/device/delete/{assetNo}
+        /// </summary>
         [HttpDelete("delete/{assetNo}")]
         public async Task<IActionResult> DeleteDevice(string assetNo)
         {
@@ -208,9 +238,9 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "デバイスが見つかりません" });
                 }
 
-                // 論理削除
+                // 論理削除（物理削除ではない）
                 device.IsDeleted = true;
-                device.UpdateDate = DateTime.UtcNow;  // UtcNowを使用
+                device.UpdateDate = DateTime.UtcNow;  // UTC時刻を使用
 
                 await _context.SaveChangesAsync();
 
@@ -226,12 +256,16 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // デバイス新規登録
+        /// <summary>
+        /// デバイス新規登録
+        /// POST: /api/device/create
+        /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> CreateDevice([FromBody] DeviceCreateDto dto)
         {
             try
             {
+                // 資産番号の重複チェック
                 var existing = await _context.MstDevices
                     .FirstOrDefaultAsync(d => d.AssetNo == dto.AssetNo);
 
@@ -240,6 +274,7 @@ namespace SUSWebApp.Server.Controllers
                     return BadRequest(new { message = "この資産番号は既に存在します" });
                 }
 
+                // 新規デバイスエンティティを作成
                 var device = new MstDevice
                 {
                     AssetNo = dto.AssetNo,
@@ -253,8 +288,8 @@ namespace SUSWebApp.Server.Controllers
                     LeaseStartDate = dto.LeaseStartDate?.ToUniversalTime(),  // UTCに変換
                     LeaseEndDate = dto.LeaseEndDate?.ToUniversalTime(),      // UTCに変換
                     Remarks = dto.Remarks,
-                    RegistrationDate = DateTime.UtcNow,  // UtcNowを使用
-                    UpdateDate = DateTime.UtcNow,        // UtcNowを使用
+                    RegistrationDate = DateTime.UtcNow,  // 登録日時
+                    UpdateDate = DateTime.UtcNow,        // 更新日時
                     IsDeleted = false
                 };
 
@@ -274,7 +309,11 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
-        // デバイス更新
+        /// <summary>
+        /// デバイス更新
+        /// PUT: /api/device/update/{assetNo}
+        /// 変更履歴も記録
+        /// </summary>
         [HttpPut("update/{assetNo}")]
         public async Task<IActionResult> UpdateDevice(string assetNo, [FromBody] DeviceUpdateDto dto)
         {
@@ -288,13 +327,15 @@ namespace SUSWebApp.Server.Controllers
                     return NotFound(new { message = "デバイスが見つかりません" });
                 }
 
-                // 更新者の社員番号を取得
+                // 更新者の社員番号を取得（HTTPヘッダーから）
                 var updaterEmployeeNo = Request.Headers["X-User-EmployeeNo"].FirstOrDefault() ?? "SYSTEM";
 
-                // 変更前の値を保存
+                // 変更履歴を保存するためのリスト
                 var histories = new List<DeviceHistory>();
 
-                // 各項目の変更をチェック
+                // ===== 各項目の変更をチェックして履歴に記録 =====
+
+                // メーカー変更
                 if (device.Manufacturer != dto.Manufacturer)
                 {
                     histories.Add(new DeviceHistory
@@ -307,6 +348,7 @@ namespace SUSWebApp.Server.Controllers
                     });
                 }
 
+                // メモリ変更
                 if (device.Memory != dto.Memory)
                 {
                     histories.Add(new DeviceHistory
@@ -319,6 +361,7 @@ namespace SUSWebApp.Server.Controllers
                     });
                 }
 
+                // ストレージ変更
                 if (device.Storage != dto.Storage)
                 {
                     histories.Add(new DeviceHistory
@@ -331,6 +374,7 @@ namespace SUSWebApp.Server.Controllers
                     });
                 }
 
+                // 保管場所変更
                 if (device.StorageLocation != dto.StorageLocation)
                 {
                     histories.Add(new DeviceHistory
@@ -343,6 +387,7 @@ namespace SUSWebApp.Server.Controllers
                     });
                 }
 
+                // 故障状態変更
                 if (device.IsBroken != dto.IsBroken)
                 {
                     histories.Add(new DeviceHistory
@@ -389,23 +434,29 @@ namespace SUSWebApp.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// デバイス変更履歴取得
+        /// GET: /api/device/history
+        /// </summary>
         [HttpGet("history")]
         public async Task<IActionResult> GetDeviceHistory()
         {
             try
             {
                 var histories = await _context.DeviceHistories
-                    .OrderByDescending(h => h.ChangeDate)
+                    .OrderByDescending(h => h.ChangeDate)  // 新しい順
                     .Select(h => new
                     {
                         id = h.Id,
                         changeDate = h.ChangeDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm"),
                         updaterEmployeeNo = h.UpdaterEmployeeNo,
+                        // 更新者名を結合
                         updaterName = _context.MstUsers
                             .Where(u => u.EmployeeNo == h.UpdaterEmployeeNo)
                             .Select(u => u.Name)
                             .FirstOrDefault() ?? "不明",
                         targetAssetNo = h.TargetAssetNo,
+                        // デバイス情報を結合
                         targetManufacturer = _context.MstDevices
                             .Where(d => d.AssetNo == h.TargetAssetNo)
                             .Select(d => d.Manufacturer)

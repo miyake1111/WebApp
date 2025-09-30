@@ -1,13 +1,17 @@
-﻿/* ReturnForm.css */
+﻿/* ReturnForm.css - 返却フォームモーダルのスタイル */
+
+/* 返却フォームモーダル本体 */
 .return-form-modal {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 500px;
-    max-width: 90vw;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+    background: white; /* 白背景 */
+    border-radius: 8px; /* 角丸8px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 影で立体感 */
+    width: 500px; /* 固定幅500px */
+    max-width: 90vw; /* ビューポートの90%を最大幅 */
+    max-height: 80vh; /* ビューポートの80%を最大高さ */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
 }
 
 /* 他のスタイルはRentalForm.cssと共通なので省略または共通化可能 */
+/* 実際の実装では、共通スタイルを別ファイルに分離するか、
+   RentalForm.cssのクラスを再利用することが推奨される */

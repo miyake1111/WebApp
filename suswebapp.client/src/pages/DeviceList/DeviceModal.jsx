@@ -1,26 +1,44 @@
 ﻿import React, { useState, useEffect } from 'react';
 import './DeviceModal.css';
 
+/**
+ * デバイス編集/新規登録モーダルコンポーネント
+ * 機器情報の入力フォームとバリデーション機能を提供
+ * 
+ * @param {boolean} isOpen - モーダルの表示/非表示状態
+ * @param {Function} onClose - モーダルを閉じる関数
+ * @param {Object} device - 編集対象のデバイス（新規登録時はnull）
+ * @param {Function} onSave - 保存処理を行う関数
+ * @param {string} mode - 動作モード（'add': 新規登録, 'edit': 編集）
+ */
 const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
+    // フォームデータの状態管理
     const [formData, setFormData] = useState({
-        assetNo: '',
-        manufacturer: '',
-        os: '',
-        memory: '',
-        storage: '',
-        graphicsCard: '',
-        storageLocation: '',
-        isBroken: false,
-        leaseStartDate: '',
-        leaseEndDate: '',
-        remarks: ''
+        assetNo: '',            // 資産番号
+        manufacturer: '',       // メーカー
+        os: '',                // OS
+        memory: '',            // メモリ（GB）
+        storage: '',           // ストレージ（GB）
+        graphicsCard: '',      // グラフィックカード
+        storageLocation: '',   // 保管場所
+        isBroken: false,       // 故障フラグ
+        leaseStartDate: '',    // リース開始日
+        leaseEndDate: '',      // リース終了日
+        remarks: ''            // 備考
     });
 
+    // エラーメッセージ管理
     const [errors, setErrors] = useState({});
+    // 資産番号重複チェック中フラグ
     const [isChecking, setIsChecking] = useState(false);
 
+    /**
+     * モーダルが開かれた時の初期化処理
+     * 編集モード時は既存データをセット、新規登録時はリセット
+     */
     useEffect(() => {
         if (device && mode === 'edit') {
+            // 編集モード - 既存データをフォームにセット
             setFormData({
                 assetNo: device.assetNo || '',
                 manufacturer: device.manufacturer || '',
@@ -31,7 +49,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                 storageLocation: device.storageLocation || '',
                 isBroken: device.isBroken || false,
                 leaseStartDate: device.leaseStartDate
-                    ? device.leaseStartDate.split('T')[0]
+                    ? device.leaseStartDate.split('T')[0]  // 日付部分のみ抽出
                     : '',
                 leaseEndDate: device.leaseEndDate
                     ? device.leaseEndDate.split('T')[0]
@@ -40,11 +58,11 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
             });
             setErrors({});
         } else if (mode === 'add' && isOpen) {
-            // 新規登録時はフォームをリセット
+            // 新規登録モード - フォームをリセット
             setFormData({
                 assetNo: '',
                 manufacturer: '',
-                os: 'Windows10',
+                os: 'Windows10',  // デフォルト値
                 memory: '',
                 storage: '',
                 graphicsCard: '',
@@ -58,18 +76,26 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     }, [device, mode, isOpen]);
 
-    // 資産番号の重複チェック
+    /**
+     * 資産番号の重複チェック（非同期）
+     * 新規登録時のみ実行
+     * 
+     * @param {string} assetNo - チェック対象の資産番号
+     */
     const checkAssetNoDuplicate = async (assetNo) => {
+        // 正規表現で形式をチェック（A19-2024-01形式）
         if (mode === 'add' && assetNo && /^[A-Z][0-9]{2}-[0-9]{4}-[0-9]{2}$/.test(assetNo)) {
             setIsChecking(true);
             try {
                 const response = await fetch('/api/device/list');
                 const data = await response.json();
                 if (data.success) {
+                    // 既存データと照合
                     const exists = data.data.some(d => d.assetNo === assetNo);
                     if (exists) {
                         setErrors(prev => ({ ...prev, assetNo: 'この資産番号は既に使用されています' }));
                     } else {
+                        // エラーをクリア
                         const newErrors = { ...errors };
                         delete newErrors.assetNo;
                         setErrors(newErrors);
@@ -83,14 +109,18 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     };
 
-    // 資産番号の入力制限（形式：A19-2024-01）
+    /**
+     * 資産番号の入力制限
+     * 形式：A19-2024-01（英字1文字+数字2桁-数字4桁-数字2桁）
+     * 修正：正しい形式チェック
+     */
     const handleAssetNoChange = (e) => {
         const value = e.target.value.toUpperCase();
         // 英数字とハイフンのみ許可
         if (/^[A-Z0-9-]*$/.test(value)) {
             setFormData({ ...formData, assetNo: value });
 
-            // 形式チェック
+            // 形式チェック（A19-01-012形式）
             if (value && !/^[A-Z][0-9]{2}-[0-9]{2}-[0-9]{3}$/.test(value)) {
                 setErrors({ ...errors, assetNo: '形式: A19-01-012（英字1文字+数字2桁-数字2桁-数字3桁）' });
             } else {
@@ -99,16 +129,21 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     };
 
-    // メーカーの入力制限
+    /**
+     * メーカーの入力処理
+     */
     const handleManufacturerChange = (e) => {
         const value = e.target.value;
         setFormData({ ...formData, manufacturer: value });
     };
 
-    // メモリの入力制限（4の倍数チェック）
+    /**
+     * メモリの入力制限（4の倍数チェック）
+     * 4GB～128GBの範囲で、4の倍数のみ許可
+     */
     const handleMemoryChange = (e) => {
         const value = e.target.value;
-        if (/^\d*$/.test(value) || value === '') {
+        if (/^\d*$/.test(value) || value === '') {  // 数字のみ許可
             setFormData({ ...formData, memory: value });
 
             if (value) {
@@ -118,6 +153,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                 } else if (memValue % 4 !== 0) {
                     setErrors({ ...errors, memory: '4の倍数で入力してください（4, 8, 16, 32...）' });
                 } else {
+                    // エラーをクリア
                     const newErrors = { ...errors };
                     delete newErrors.memory;
                     setErrors(newErrors);
@@ -126,10 +162,13 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     };
 
-    // 容量の入力制限
+    /**
+     * ストレージの入力制限
+     * 120GB～8000GBの範囲
+     */
     const handleStorageChange = (e) => {
         const value = e.target.value;
-        if (/^\d*$/.test(value) || value === '') {
+        if (/^\d*$/.test(value) || value === '') {  // 数字のみ許可
             setFormData({ ...formData, storage: value });
 
             if (value) {
@@ -137,6 +176,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                 if (storageValue < 120 || storageValue > 8000) {
                     setErrors({ ...errors, storage: '120GB～8000GBの範囲で入力してください' });
                 } else {
+                    // エラーをクリア
                     const newErrors = { ...errors };
                     delete newErrors.storage;
                     setErrors(newErrors);
@@ -145,7 +185,10 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     };
 
-    // 日付の整合性チェック
+    /**
+     * 日付の整合性チェック
+     * リース終了日が開始日より後であることを確認
+     */
     const handleDateChange = (e) => {
         const { name, value } = e.target;
         const newFormData = { ...formData, [name]: value };
@@ -157,6 +200,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                 if (newFormData.leaseStartDate >= newFormData.leaseEndDate) {
                     setErrors({ ...errors, leaseEndDate: 'リース期限日は開始日より後の日付を設定してください' });
                 } else {
+                    // エラーをクリア
                     const newErrors = { ...errors };
                     delete newErrors.leaseEndDate;
                     setErrors(newErrors);
@@ -173,6 +217,9 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }
     };
 
+    /**
+     * 汎用的な入力変更処理
+     */
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -181,6 +228,10 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
         }));
     };
 
+    /**
+     * フォーム送信処理
+     * バリデーション後、親コンポーネントの保存関数を呼び出し
+     */
     const handleSubmit = () => {
         // バリデーションチェック
         const validationErrors = {};
@@ -213,6 +264,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
             }
         }
 
+        // エラーがある場合は送信を中止
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             alert('入力内容にエラーがあります');
@@ -234,18 +286,25 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
             remarks: formData.remarks || ""
         };
 
+        // 親コンポーネントの保存関数を呼び出し
         onSave(submitData);
     };
 
+    // モーダルが閉じている場合は何も表示しない
     if (!isOpen) return null;
 
     return (
+        // モーダルオーバーレイ - クリックで閉じる
         <div className="modal-overlay" onClick={onClose}>
+            {/* モーダル本体 - クリックイベントの伝播を停止 */}
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>{mode === 'edit' ? '機器情報編集' : '新規機器登録'}</h2>
 
+                {/* フォーム本体 */}
                 <div className="form-container">
+                    {/* 左側カラム */}
                     <div className="form-left">
+                        {/* 資産番号入力 */}
                         <div className="form-group">
                             <label>資産番号 *</label>
                             <input
@@ -253,14 +312,15 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                                 name="assetNo"
                                 value={formData.assetNo}
                                 onChange={handleAssetNoChange}
-                                disabled={mode === 'edit'}
-                                placeholder="A19-2024-01"
+                                disabled={mode === 'edit'}  // 編集時は変更不可
+                                placeholder="A19-01-012"
                                 maxLength="12"
                             />
                             {errors.assetNo && <span className="error-text">{errors.assetNo}</span>}
                             {isChecking && <span className="checking-text">重複確認中...</span>}
                         </div>
 
+                        {/* メーカー入力 */}
                         <div className="form-group">
                             <label>メーカー</label>
                             <input
@@ -272,6 +332,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             />
                         </div>
 
+                        {/* OS選択 */}
                         <div className="form-group">
                             <label>OS</label>
                             <select
@@ -288,6 +349,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             </select>
                         </div>
 
+                        {/* メモリ入力 */}
                         <div className="form-group">
                             <label>メモリ (GB)</label>
                             <input
@@ -300,6 +362,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             {errors.memory && <span className="error-text">{errors.memory}</span>}
                         </div>
 
+                        {/* 容量入力 */}
                         <div className="form-group">
                             <label>容量 (GB)</label>
                             <input
@@ -312,6 +375,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             {errors.storage && <span className="error-text">{errors.storage}</span>}
                         </div>
 
+                        {/* グラフィックボード入力 */}
                         <div className="form-group">
                             <label>グラフィックボード</label>
                             <input
@@ -322,6 +386,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             />
                         </div>
 
+                        {/* 故障チェックボックス */}
                         <div className="form-group">
                             <label>故障</label>
                             <input
@@ -333,7 +398,9 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                         </div>
                     </div>
 
+                    {/* 右側カラム */}
                     <div className="form-right">
+                        {/* 保管場所入力 */}
                         <div className="form-group">
                             <label>保管場所 *</label>
                             <input
@@ -346,7 +413,9 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             {errors.storageLocation && <span className="error-text">{errors.storageLocation}</span>}
                         </div>
 
+                        {/* リース日付（横並び） */}
                         <div className="form-group-row">
+                            {/* リース開始日 */}
                             <div className="form-group">
                                 <label>リース開始日</label>
                                 <input
@@ -357,6 +426,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                                 />
                             </div>
 
+                            {/* リース期限日 */}
                             <div className="form-group">
                                 <label>リース期限日</label>
                                 <input
@@ -369,6 +439,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                             </div>
                         </div>
 
+                        {/* 備考入力 */}
                         <div className="form-group">
                             <label>備考</label>
                             <textarea
@@ -381,6 +452,7 @@ const DeviceModal = ({ isOpen, onClose, device, onSave, mode }) => {
                     </div>
                 </div>
 
+                {/* ボタングループ */}
                 <div className="modal-buttons">
                     <button className="save-btn" onClick={handleSubmit} disabled={isChecking}>
                         {mode === 'edit' ? '変更' : '登録'}

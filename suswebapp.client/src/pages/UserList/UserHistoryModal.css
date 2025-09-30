@@ -1,180 +1,199 @@
-﻿.history-modal-content {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    width: 90%;
-    max-width: 900px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+﻿/* 履歴モーダルのコンテンツ本体 */
+.history-modal-content {
+    background: white; /* 白背景 */
+    border-radius: 15px; /* 角丸15px */
+    padding: 30px; /* 内側余白30px */
+    width: 90%; /* 親要素の90%幅 */
+    max-width: 900px; /* 最大幅900px */
+    max-height: 80vh; /* ビューポートの80%高さまで */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
 }
 
+/* ヘッダー部分（タイトルとフィルター） */
 .history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: space-between; /* 左右に分散配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    margin-bottom: 20px; /* 下方向余白20px */
 }
 
+    /* モーダルタイトル */
     .history-header h2 {
-        color: #333;
-        font-size: 24px;
+        color: #333; /* ダークグレー文字 */
+        font-size: 24px; /* フォントサイズ24px */
     }
 
+/* フィルターボタングループ */
 .filter-buttons {
-    display: flex;
-    gap: 10px;
+    display: flex; /* Flexboxレイアウト */
+    gap: 10px; /* ボタン間隔10px */
 }
 
+/* フィルターボタン個別 */
 .filter-btn {
-    padding: 8px 20px;
-    border: 2px solid #ddd;
-    background-color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    color: #333;
+    padding: 8px 20px; /* 内側余白 */
+    border: 2px solid #ddd; /* グレー境界線 */
+    background-color: white; /* 白背景 */
+    border-radius: 6px; /* 角丸6px */
+    cursor: pointer; /* ポインターカーソル */
+    font-size: 14px; /* フォントサイズ14px */
+    transition: all 0.2s ease; /* すべてのプロパティを0.2秒でアニメーション */
+    color: #333; /* ダークグレー文字 */
 }
 
+    /* フィルターボタンのホバー効果 */
     .filter-btn:hover {
-        background-color: #f8f9fa;
+        background-color: #f8f9fa; /* 薄いグレー背景 */
     }
 
+    /* アクティブなフィルターボタン */
     .filter-btn.active {
-        background-color: #3498db;
-        color: white;
-        border-color: #3498db;
+        background-color: #3498db; /* 青背景 */
+        color: white; /* 白文字 */
+        border-color: #3498db; /* 青境界線 */
     }
 
-/* テーブルコンテナ追加 */
+/* テーブルコンテナ - テーブル全体を囲む */
 .history-table-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border: 2px solid #dee2e6; /* ← 1px から 2px に変更し、色も調整 */
-    border-radius: 8px;
-    overflow: hidden;
-    min-height: 0;
-    background: white; /* ← 背景色を追加 */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ← 影を追加（オプション） */
+    flex: 1; /* 残りスペースを使用 */
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    border: 2px solid #dee2e6; /* 太めの境界線で囲む */
+    border-radius: 8px; /* 角丸8px */
+    overflow: hidden; /* はみ出し部分を隠す */
+    min-height: 0; /* flexアイテムの縮小を許可 */
+    background: white; /* 白背景 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 影で立体感（オプション） */
 }
 
+/* テーブルラッパー - スクロール領域 */
 .history-table-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: auto;
+    flex: 1; /* 残りスペースを使用 */
+    overflow-y: auto; /* 縦スクロール可能 */
+    overflow-x: auto; /* 横スクロール可能 */
 }
 
-    /* スクロールバーのスタイル（ユーザー一覧と同じ） */
+    /* Webkit系ブラウザのスクロールバーカスタマイズ */
     .history-table-wrapper::-webkit-scrollbar {
-        height: 8px;
-        width: 8px;
+        height: 8px; /* スクロールバー高さ */
+        width: 8px; /* スクロールバー幅 */
     }
 
     .history-table-wrapper::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
+        background: #f1f1f1; /* トラック背景色 */
+        border-radius: 4px; /* 角丸4px */
     }
 
     .history-table-wrapper::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
+        background: #888; /* つまみの色 */
+        border-radius: 4px; /* 角丸4px */
     }
 
         .history-table-wrapper::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: #555; /* ホバー時は濃いグレー */
         }
 
+/* 履歴テーブル本体 */
 .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
+    width: 100%; /* 幅100% */
+    border-collapse: collapse; /* セル間の隙間を削除 */
+    min-width: 800px; /* 最小幅800px */
 }
 
+    /* テーブルヘッダー */
     .history-table th {
-        background-color: #34495e;
-        color: white;
-        padding: 10px;
-        text-align: left;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        background-color: #34495e; /* ダークグレー背景 */
+        color: white; /* 白文字 */
+        padding: 10px; /* 内側余白10px */
+        text-align: left; /* 左寄せ */
+        position: sticky; /* スクロール時に固定 */
+        top: 0; /* 上端に固定 */
+        z-index: 10; /* 前面に表示 */
     }
 
+    /* テーブルセル */
     .history-table td {
-        padding: 10px;
-        border-bottom: 1px solid #ecf0f1;
-        color: #333;
+        padding: 10px; /* 内側余白10px */
+        border-bottom: 1px solid #ecf0f1; /* 薄いグレーの下線 */
+        color: #333; /* ダークグレー文字 */
     }
 
+    /* 行のホバー効果 */
     .history-table tr:hover {
-        background-color: #f8f9fa;
+        background-color: #f8f9fa; /* 薄いグレー背景 */
     }
 
 /* 表示件数フッター */
 .history-footer {
-    padding: 15px 20px;
-    background-color: #f8f9fa;
-    border-top: 2px solid #dee2e6;
-    border-radius: 0 0 8px 8px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-shrink: 0;
+    padding: 15px 20px; /* 内側余白 */
+    background-color: #f8f9fa; /* 薄いグレー背景 */
+    border-top: 2px solid #dee2e6; /* グレー上線 */
+    border-radius: 0 0 8px 8px; /* 下部のみ角丸 */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: flex-start; /* 左寄せ */
+    align-items: center; /* 垂直方向中央配置 */
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
+/* 件数表示テキスト */
 .record-count {
-    font-size: 14px;
-    color: #6c757d;
-    font-weight: 500;
+    font-size: 14px; /* フォントサイズ14px */
+    color: #6c757d; /* グレー文字 */
+    font-weight: 500; /* 中太字 */
 }
 
+/* データなし表示 */
 .no-data {
-    text-align: center;
-    color: #999;
-    padding: 30px !important;
+    text-align: center; /* 中央寄せ */
+    color: #999; /* 薄いグレー文字 */
+    padding: 30px !important; /* 内側余白30px（優先） */
 }
 
+/* モーダルフッター（ボタン配置用） */
 .modal-footer {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 中央配置 */
+    margin-top: 20px; /* 上方向余白20px */
 }
 
+/* 従業員情報セル（複数行表示） */
 .employee-info-cell {
-    line-height: 1.4;
-    padding: 8px !important;
+    line-height: 1.4; /* 行間1.4倍 */
+    padding: 8px !important; /* 内側余白8px（優先） */
 }
 
+    /* 各行の余白 */
     .employee-info-cell div {
-        margin: 2px 0;
+        margin: 2px 0; /* 上下余白2px */
     }
 
+    /* カナ表示（小さく表示） */
     .employee-info-cell .kana {
-        font-size: 0.85em;
-        color: #666;
+        font-size: 0.85em; /* フォントサイズ0.85倍 */
+        color: #666; /* グレー文字 */
     }
 
+/* ローディング表示 */
 .loading {
-    text-align: center;
-    padding: 50px;
-    font-size: 18px;
-    color: #7f8c8d;
+    text-align: center; /* 中央寄せ */
+    padding: 50px; /* 内側余白50px */
+    font-size: 18px; /* フォントサイズ18px */
+    color: #7f8c8d; /* グレー文字 */
 }
 
-/* ボタンの色変更 */
+/* キャンセルボタン */
 .cancel-btn {
-    padding: 10px 30px;
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    padding: 10px 30px; /* 内側余白 */
+    background-color: #e74c3c; /* 赤背景 */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 6px; /* 角丸6px */
+    font-size: 16px; /* フォントサイズ16px */
+    cursor: pointer; /* ポインターカーソル */
+    transition: background-color 0.2s; /* 背景色の変化を0.2秒でアニメーション */
 }
 
     .cancel-btn:hover {
-        background-color: #c0392b;
+        background-color: #c0392b; /* ホバー時は濃い赤 */
     }

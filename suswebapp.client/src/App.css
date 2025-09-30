@@ -1,127 +1,135 @@
 ﻿/* アプリ全体のスタイル */
 .app {
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
+    width: 100%; /* 幅100% */
+    height: 100%; /* 高さ100% */
+    min-height: 100vh; /* 最小高さはビューポート全体 */
 }
 
 /* Dashboard のスタイル */
 .dashboard {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem;
-    color: white;
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    justify-content: center; /* 垂直方向中央配置 */
+    align-items: center; /* 水平方向中央配置 */
+    min-height: 100vh; /* 最小高さはビューポート全体 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 紫グラデーション背景 */
+    padding: 2rem; /* 内側余白2rem */
+    color: white; /* 白文字 */
 }
 
+    /* ダッシュボードのタイトル */
     .dashboard h1 {
-        color: white;
-        margin-bottom: 3rem;
-        text-align: center;
-        font-size: 2.5rem;
-        font-weight: 600;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        color: white; /* 白文字 */
+        margin-bottom: 3rem; /* 下方向余白3rem */
+        text-align: center; /* 中央寄せ */
+        font-size: 2.5rem; /* フォントサイズ2.5rem */
+        font-weight: 600; /* セミボールド */
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* テキストシャドウで立体感 */
     }
 
-/* ユーザー情報表示 */
+/* ユーザー情報表示エリア */
 .user-info {
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    text-align: center;
-    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.1); /* 半透明白背景 */
+    padding: 1rem; /* 内側余白1rem */
+    border-radius: 8px; /* 角丸8px */
+    margin-bottom: 2rem; /* 下方向余白2rem */
+    text-align: center; /* 中央寄せ */
+    backdrop-filter: blur(5px); /* 背景ぼかし効果 */
 }
 
+    /* ユーザー情報の段落 */
     .user-info p {
-        margin: 0.5rem 0;
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.9);
+        margin: 0.5rem 0; /* 上下余白0.5rem */
+        font-size: 1rem; /* フォントサイズ1rem */
+        color: rgba(255, 255, 255, 0.9); /* 薄い白文字 */
     }
 
-/* メニューボタン */
+/* メニューボタングループ */
 .menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
+    gap: 1.5rem; /* ボタン間隔1.5rem */
+    margin-bottom: 3rem; /* 下方向余白3rem */
 }
 
+/* メニューボタン個別 */
 .menu-btn {
-    padding: 1rem 2rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #333;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 200px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem; /* 内側余白 */
+    background-color: rgba(255, 255, 255, 0.9); /* 半透明白背景 */
+    color: #333; /* ダークグレー文字 */
+    border: none; /* 境界線なし */
+    border-radius: 8px; /* 角丸8px */
+    font-size: 1.1rem; /* フォントサイズ1.1rem */
+    font-weight: 500; /* 中太字 */
+    cursor: pointer; /* ポインターカーソル */
+    transition: all 0.3s ease; /* すべてのプロパティを0.3秒でアニメーション */
+    min-width: 200px; /* 最小幅200px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 影で立体感 */
 }
 
+    /* メニューボタンのホバー効果 */
     .menu-btn:hover {
-        background-color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background-color: white; /* 完全な白背景 */
+        transform: translateY(-2px); /* 2px上に浮き上がる */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* 影を強調 */
     }
 
+    /* メニューボタンのクリック時 */
     .menu-btn:active {
-        transform: translateY(0);
+        transform: translateY(0); /* 元の位置に戻る */
     }
 
 /* ログアウトボタン */
 .logout-btn {
-    padding: 0.75rem 1.5rem;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem; /* 内側余白 */
+    background-color: #dc3545; /* 赤背景（危険色） */
+    color: white; /* 白文字 */
+    border: none; /* 境界線なし */
+    border-radius: 6px; /* 角丸6px */
+    font-size: 1rem; /* フォントサイズ1rem */
+    cursor: pointer; /* ポインターカーソル */
+    transition: background-color 0.2s ease, transform 0.2s ease; /* 背景色と変形のアニメーション */
+    font-weight: 500; /* 中太字 */
 }
 
+    /* ログアウトボタンのホバー効果 */
     .logout-btn:hover {
-        background-color: #c82333;
-        transform: translateY(-1px);
+        background-color: #c82333; /* 濃い赤背景 */
+        transform: translateY(-1px); /* 1px上に浮き上がる */
     }
 
+    /* ログアウトボタンのフォーカス時 */
     .logout-btn:focus {
-        outline: 2px solid #dc3545;
-        outline-offset: 2px;
+        outline: 2px solid #dc3545; /* 赤アウトライン */
+        outline-offset: 2px; /* アウトラインとの間隔2px */
     }
 
-/* レスポンシブデザイン */
+/* レスポンシブデザイン - モバイル対応（768px以下） */
 @media (max-width: 768px) {
     .dashboard {
-        padding: 1rem;
+        padding: 1rem; /* パディングを縮小 */
     }
 
         .dashboard h1 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
+            font-size: 2rem; /* フォントサイズを縮小 */
+            margin-bottom: 2rem; /* 下方向余白を縮小 */
         }
 
     .menu-buttons {
-        width: 100%;
-        max-width: 300px;
+        width: 100%; /* 幅100% */
+        max-width: 300px; /* 最大幅300px */
     }
 
     .menu-btn {
-        min-width: auto;
-        width: 100%;
+        min-width: auto; /* 最小幅を自動に */
+        width: 100%; /* 幅100% */
     }
 }
 
+/* レスポンシブデザイン - デスクトップ対応（769px以上） */
 @media (min-width: 769px) {
     .menu-buttons {
-        flex-direction: row;
-        gap: 2rem;
+        flex-direction: row; /* 横方向に配置 */
+        gap: 2rem; /* ボタン間隔2rem */
     }
 }

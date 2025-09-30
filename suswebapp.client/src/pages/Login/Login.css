@@ -1,200 +1,217 @@
-﻿/* Google Fonts - Inter */
+﻿/* Google Fontsから Inter フォントをインポート
+   font-weight: 400(通常), 500(中太), 600(太め), 700(太字) を読み込み */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* 全体のスタイル */
+/* 全体のリセットスタイル
+   ブラウザのデフォルトスタイルを統一 */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    margin: 0; /* 外側余白をゼロに */
+    padding: 0; /* 内側余白をゼロに */
+    box-sizing: border-box; /* paddingとborderを幅・高さに含める */
 }
 
+/* HTML要素とBODY要素の基本設定 */
 html, body {
-    height: 100%;
-    width: 100%;
+    height: 100%; /* ビューポート全体の高さを使用 */
+    width: 100%; /* ビューポート全体の幅を使用 */
 }
 
+/* BODY要素の詳細スタイル */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #ffffff;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', sans-serif; /* Interフォントを使用、フォールバックはサンセリフ */
+    background-color: #ffffff; /* 背景色は白 */
+    -webkit-font-smoothing: antialiased; /* Webkit系ブラウザのフォント滑らか表示 */
+    -moz-osx-font-smoothing: grayscale; /* Firefox macOSのフォント滑らか表示 */
 }
 
-/* ログインページのコンテナ - 完全中央配置 */
+/* ログインページのメインコンテナ - 画面全体に固定配置 */
 .login-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #ffffff;
-    padding: 20px;
+    position: fixed; /* ビューポートに対して固定配置 */
+    top: 0; /* 上端から0 */
+    left: 0; /* 左端から0 */
+    right: 0; /* 右端から0 */
+    bottom: 0; /* 下端から0 */
+    display: flex; /* Flexboxレイアウト */
+    justify-content: center; /* 水平方向中央配置 */
+    align-items: center; /* 垂直方向中央配置 */
+    background-color: #ffffff; /* 背景色は白 */
+    padding: 20px; /* 全方向に20pxパディング（画面端との余白確保） */
 }
 
-/* ログインカードのスタイル */
+/* ログインカード - ログインフォームを含むカード型UI */
 .login-card {
-    background-color: #a9a9a9;
-    padding: 3rem;
-    border-radius: 16px;
+    background-color: #a9a9a9; /* グレー背景 */
+    padding: 3rem; /* 内側余白3rem（約48px） */
+    border-radius: 16px; /* 角丸16px */
+    /* 多層的な影で立体感を演出 */
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.08);
-    width: 100%;
-    max-width: 450px;
-    position: relative;
-    transition: transform 0.3s ease-in-out;
+    width: 100%; /* 親要素の幅いっぱい */
+    max-width: 450px; /* 最大幅は450pxに制限 */
+    position: relative; /* 子要素の配置基準点 */
+    transition: transform 0.3s ease-in-out; /* 変形アニメーション設定 */
 }
 
+    /* ログインカードのホバー効果 */
     .login-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-5px); /* 上に5px浮き上がる効果 */
     }
 
-/* タイトルのスタイル */
+/* ログインタイトル - "PC貸出管理システム" */
 .login-title {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    color: #000000;
-    font-size: 2rem;
-    font-weight: 700;
+    text-align: center; /* 中央寄せ */
+    margin-bottom: 2.5rem; /* 下方向余白2.5rem（約40px） */
+    color: #000000; /* 黒色文字 */
+    font-size: 2rem; /* フォントサイズ2rem（約32px） */
+    font-weight: 700; /* 太字（700） */
 }
 
-/* フォームのスタイル */
+/* ログインフォーム全体 */
 .login-form {
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Flexboxレイアウト */
+    flex-direction: column; /* 縦方向に配置 */
 }
 
+/* フォームグループ（各入力項目のコンテナ） */
 .form-group {
-    margin-bottom: 2rem;
+    margin-bottom: 2rem; /* 下方向余白2rem（項目間の間隔） */
 }
 
+/* フォームラベル（"社員番号"、"パスワード"） */
 .form-label {
-    display: block;
-    margin-bottom: 0.75rem;
-    color: #000000;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
+    display: block; /* ブロック要素として表示 */
+    margin-bottom: 0.75rem; /* 下方向余白0.75rem（約12px） */
+    color: #000000; /* 黒色文字 */
+    font-weight: 600; /* セミボールド（600） */
+    font-size: 0.95rem; /* フォントサイズ0.95rem（約15px） */
+    letter-spacing: 0.5px; /* 文字間隔0.5px */
 }
 
-/* 入力フィールド */
+/* 入力フィールド（テキスト入力欄） */
 .form-input {
-    width: 100%;
-    padding: 1rem 1.25rem;
-    border: 1px solid #dfe6e9;
-    border-radius: 10px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    background-color: #ffffff;
-    color: #34495e;
+    width: 100%; /* 幅100% */
+    padding: 1rem 1.25rem; /* 上下1rem、左右1.25remの内側余白 */
+    border: 1px solid #dfe6e9; /* 薄いグレーの境界線 */
+    border-radius: 10px; /* 角丸10px */
+    font-size: 1rem; /* フォントサイズ1rem（約16px） */
+    box-sizing: border-box; /* paddingとborderを幅に含める */
+    transition: all 0.3s ease; /* すべてのプロパティを0.3秒でアニメーション */
+    background-color: #ffffff; /* 背景色は白 */
+    color: #34495e; /* テキスト色は暗めのグレー */
 }
 
+    /* 入力フィールドのフォーカス時 */
     .form-input:focus {
-        outline: none;
-        border-color: #6c5ce7;
-        box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
-        background-color: white;
+        outline: none; /* デフォルトのアウトラインを削除 */
+        border-color: #6c5ce7; /* 紫色の境界線 */
+        box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); /* 紫色の光彩効果 */
+        background-color: white; /* 背景色を白に */
     }
 
+    /* 入力フィールドのホバー時 */
     .form-input:hover {
-        border-color: #bdc3c7;
+        border-color: #bdc3c7; /* 少し濃いグレーの境界線 */
     }
 
-/* エラーメッセージ */
+/* エラーメッセージ表示エリア */
 .error-message {
-    background-color: #ffebee;
-    color: #c0392b;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    border: 1px solid #e74c3c;
-    font-size: 0.9rem;
-    text-align: center;
-    line-height: 1.5;
+    background-color: #ffebee; /* 薄いピンク背景（エラー感） */
+    color: #c0392b; /* 赤色文字 */
+    padding: 1rem; /* 内側余白1rem */
+    border-radius: 8px; /* 角丸8px */
+    margin-bottom: 2rem; /* 下方向余白2rem */
+    border: 1px solid #e74c3c; /* 赤色の境界線 */
+    font-size: 0.9rem; /* フォントサイズ0.9rem（約14px） */
+    text-align: center; /* 中央寄せ */
+    line-height: 1.5; /* 行間1.5倍 */
 }
 
 /* ログインボタン */
 .login-btn {
-    width: 100%;
-    padding: 1rem;
-    background: #d3d3d3;
-    color: #000000;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+    width: 100%; /* 幅100% */
+    padding: 1rem; /* 内側余白1rem */
+    background: #d3d3d3; /* ライトグレー背景 */
+    color: #000000; /* 黒色文字 */
+    border: none; /* 境界線なし */
+    border-radius: 10px; /* 角丸10px */
+    font-size: 1.1rem; /* フォントサイズ1.1rem（約18px） */
+    font-weight: 600; /* セミボールド */
+    cursor: pointer; /* カーソルをポインターに */
+    transition: all 0.3s ease; /* すべてのプロパティを0.3秒でアニメーション */
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); /* 紫色の影 */
 }
 
+    /* ログインボタンのホバー時（ローディング中と無効時を除く） */
     .login-btn:hover:not(.loading):not(:disabled) {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+        transform: translateY(-3px); /* 上に3px浮き上がる */
+        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3); /* 影を強調 */
     }
 
+    /* ログインボタンのクリック時 */
     .login-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+        transform: translateY(0); /* 元の位置に戻る */
+        box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); /* 影を元に戻す */
     }
 
+    /* ログインボタンのローディング中または無効時 */
     .login-btn.loading,
     .login-btn:disabled {
-        background: #bdc3c7;
-        cursor: not-allowed;
-        opacity: 0.8;
-        transform: none;
-        box-shadow: none;
+        background: #bdc3c7; /* グレー背景 */
+        cursor: not-allowed; /* 禁止カーソル */
+        opacity: 0.8; /* 透明度80% */
+        transform: none; /* 変形なし */
+        box-shadow: none; /* 影なし */
     }
 
-/* Chromium系ブラウザ（Chrome, Edge）のパスワード表示アイコンの色変更 */
+/* ===== ブラウザ別パスワード表示アイコンのカスタマイズ ===== */
+
+/* Chromium系ブラウザ（Chrome, Edge）のパスワード表示/クリアアイコン */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
-    color: #000000;
-    background-color: transparent;
+    color: #000000; /* アイコンの色を黒に */
+    background-color: transparent; /* 背景を透明に */
 }
 
-/* Webkit系ブラウザ用 */
+/* Webkit系ブラウザのパスワード装飾コンテナ */
 input[type="password"]::-webkit-textfield-decoration-container {
-    filter: invert(1);
+    filter: invert(1); /* 色を反転（白→黒） */
 }
 
-/* Edge専用 */
+/* Microsoft Edge専用のパスワード表示アイコン */
 input[type="password"]::-ms-reveal {
-    filter: invert(1);
+    filter: invert(1); /* 色を反転 */
 }
 
-/* パスワードフィールド全体の調整（必要に応じて） */
+/* パスワードフィールド全体のスタイル調整 */
 .form-input[type="password"] {
-    color: #34495e; /* テキストの色 */
-    background-color: #ffffff; /* 背景色を明確に白に */
+    color: #34495e; /* テキストの色をダークグレーに */
+    background-color: #ffffff; /* 背景色を確実に白に設定 */
 }
 
-/* レスポンシブデザイン */
+/* ===== レスポンシブデザイン ===== */
+
+/* スマートフォン対応（480px以下） */
 @media (max-width: 480px) {
     .login-container {
-        padding: 1rem;
+        padding: 1rem; /* パディングを1remに縮小 */
     }
 
     .login-card {
-        padding: 2rem;
+        padding: 2rem; /* カードのパディングを2remに縮小 */
     }
 
     .login-title {
-        font-size: 1.5rem;
+        font-size: 1.5rem; /* タイトルのフォントサイズを1.5remに縮小 */
     }
 
     .form-input {
-        padding: 0.8rem 1rem;
+        padding: 0.8rem 1rem; /* 入力フィールドのパディングを調整 */
     }
 }
 
-/* 大画面対応 */
+/* 大画面対応（1920px以上） */
 @media (min-width: 1920px) {
     .login-card {
-        max-width: 500px;
-        padding: 3.5rem;
+        max-width: 500px; /* カードの最大幅を500pxに拡大 */
+        padding: 3.5rem; /* パディングを3.5remに増加 */
     }
 }
